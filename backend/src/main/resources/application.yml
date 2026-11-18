@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: turnosia
+  datasource:
+    # Valores por defecto para desarrollo local; en producción se inyectan por variables de entorno.
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/turnosia}
+    username: ${DB_USER:turnosia}
+    password: ${DB_PASSWORD:turnosia}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+
+server:
+  port: 8080

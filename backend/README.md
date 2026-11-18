@@ -1,5 +1,18 @@
 # backend/
 
-Backend Spring Boot (Java 21, Maven). Se crea en E1-T1 del roadmap.
+Backend Spring Boot 4 (Java 21, Maven) de Turnos IA. Paquete raíz: `com.turnosia`.
 
-Placeholder para fijar la estructura del repo.
+## Requisitos
+- JDK 21, Maven (o el wrapper `./mvnw`), Docker (PostgreSQL 16 + pgvector).
+
+## Desarrollo local
+1. Desde la raíz del repo: `docker compose up -d` (levanta PostgreSQL).
+2. Desde `backend/`: `./mvnw spring-boot:run` (Windows: `.\mvnw.cmd spring-boot:run`).
+
+Configuración por variables de entorno (`DB_URL`, `DB_USER`, `DB_PASSWORD`); ver `.env.example` en la raíz.
+
+## Pruebas
+- `./mvnw test` — unitarias + integración (Testcontainers levanta PostgreSQL real).
+
+## Migraciones
+Flyway: `src/main/resources/db/migration/`. Nunca editar una migración ya aplicada.
