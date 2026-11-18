@@ -22,6 +22,7 @@ Falta: E0-T2 (resolver preguntas abiertas) y E0-T3 (fechas objetivo).
 - (el agente anota aquí lo que se le ocurra fuera del alcance de la tarea)
 
 ## Bitácora (más reciente arriba)
+- 2026-11-18 — README principal ampliado con el contexto general del proyecto; regla de commit + push siempre.
 - 2026-11-18 — E0-T1: estructura del repo (`backend/`, `frontend/`, `database/`, `docs/`), `.gitignore`, `.env.example`; git init + primer commit + push a github.com/JohnDehiby25/turnos-ia.
 
 ## Progreso

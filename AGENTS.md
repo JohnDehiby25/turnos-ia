@@ -24,7 +24,7 @@ Yo (el desarrollador) quiero ir paso a paso. NO construyas el sistema de una sol
 3. Pruebas: cuáles escribiste y resultado (`X passed`).
 4. Seguridad y buenas prácticas aplicadas (1–3 viñetas).
 5. Próxima tarea sugerida.
-Luego actualiza `docs/PROGRESO.md` y pregunta: "¿Apruebo commit y seguimos?". Hace commit solo si digo que sí.
+Luego actualiza `docs/PROGRESO.md` y haz commit + push a GitHub (regla fija, ver "Reglas críticas").
 
 **Al cerrar la sesión** (si digo "cerramos" o similar): deja `docs/PROGRESO.md` con un punto de control claro
 ("Estoy en…, falta…, siguiente paso…").
@@ -85,6 +85,7 @@ backend/  frontend/  database/  docs/  .opencode/{skills,command}/  docker-compo
 - No borrar citas: se cancelan (`CANCELLED`).
 - Ninguna tarea se da por terminada sin pruebas unitarias de su lógica de negocio.
 - Seguridad desde el inicio, no "al final": aplica el checklist de `SEGURIDAD.md` de la etapa en curso.
+- Commit + push a GitHub después de cada tarea terminada (sin esperar aprobación para commitear).
 
 ## Buenas prácticas (resumen; detalle en `docs/BUENAS_PRACTICAS.md`)
 - Código simple primero (KISS/YAGNI). Un patrón de diseño solo si resuelve un problema concreto de ESTA tarea,
