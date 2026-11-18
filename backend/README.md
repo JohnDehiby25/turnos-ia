@@ -16,3 +16,4 @@ Configuración por variables de entorno (`DB_URL`, `DB_USER`, `DB_PASSWORD`); ve
 
 ## Migraciones
 Flyway: `src/main/resources/db/migration/`. Nunca editar una migración ya aplicada.
+Todo el esquema de la BD va aquí como migración (no hay carpeta `database/` en la raíz).

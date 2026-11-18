@@ -56,7 +56,7 @@ Detalle en `docs/ARQUITECTURA.md`.
 
 ## Estructura del repo
 ```
-backend/  frontend/  database/  diseño/  docs/  .opencode/{skills,command}/  docker-compose.yml
+backend/  frontend/  diseño/  docs/  .opencode/{skills,command}/  docker-compose.yml
 ```
 
 ## Documentos: cuándo leerlos

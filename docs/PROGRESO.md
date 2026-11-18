@@ -34,6 +34,7 @@ Siguiente: E1-T5 (`AppointmentService`: crear, cancelar, reprogramar, estados, s
 - Clientes que pagan a fin de mes (cepillados semanales): posible cuentas por cobrar — fuera de alcance por ahora.
 
 ## Bitácora (más reciente arriba)
+- 2026-11-18 — Organización: se borró `database/` de la raíz (solo tenía README). Las migraciones quedan en `backend/src/main/resources/db/migration/`; el README pasó a `backend/README.md`.
 - 2026-11-18 — E1-T4: `AvailabilityService` (huecos cada 15 min, citas no canceladas, almuerzo, pasado excluido) + `FreeSlot` + consulta `findNotCancelledOverlapping` + `ClockConfig`. 10 unitarias + 2 de repositorio; suite completa 37 verdes. Diagrama de clases actualizado. Sin commit (pendiente de OK).
 - 2026-11-18 — E1-T3: `ScheduleService` + `DaySchedule` (horario efectivo por fecha: override > semanal, domingos cerrados) + 7 tests unitarios verdes. Diagrama de clases actualizado con `DaySchedule`. Sin commit (pendiente de OK).
 - 2026-11-18 — E1-T2: entidades JPA (5) + repositorios (5) + tests con Testcontainers; 18 tests verdes. Ajuste en V1: `working_hours` ahora tiene `id` BIGSERIAL (Hibernate no permite @Convert en @Id).

@@ -27,7 +27,7 @@ En desarrollo por etapas. Ver `docs/ROADMAP.md` (plan) y `docs/PROGRESO.md` (ava
 
 ## Estructura
 ```
-backend/    frontend/    database/    diseño/    docs/    .opencode/
+backend/    frontend/    diseño/    docs/    .opencode/
 ```
 
 ## Documentación
