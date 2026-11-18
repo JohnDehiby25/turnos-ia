@@ -2,17 +2,23 @@
 
 ## Estado actual
 - Etapa: E1 — Backend núcleo (sin IA)
-- Última tarea terminada: E1-T5a (commit `7ac2515`, publicado en GitHub)
-- Tarea en curso: E1-T5b (`AppointmentService`) terminada en código y pruebas; pendiente de OK del usuario para commit
-- Próxima tarea: E1-T6 (controladores REST, DTOs, manejo de errores, tests MockMvc) — pendiente de confirmar
+- Última tarea terminada: E1-T5b (commit `3ef8660`, publicado en GitHub)
+- Tarea en curso: E1-T6 (controladores REST, DTOs, manejo de errores, MockMvc) terminada en código y pruebas; pendiente de OK del usuario para commit
+- Próxima tarea: E1-T7 (seguridad: login de la dueña, CORS, validaciones) — pendiente de confirmar
 
 ## Punto de control
-E1-T5b lista en código: `AppointmentService` (crear, reprogramar, cancelar, `markAttended`, `markNoShow`), `AvailabilityService.isAvailable`,
-`AppointmentStatus.canTransitionTo`, métodos `changeStatus`/`reschedule` en `Appointment`. Suite completa: 77 tests en verde
-(Docker encendido), incluidas 6 de integración con PostgreSQL real. Falta: OK para commit + push.
-Siguiente: E1-T6 (controladores REST + DTOs + manejo global de errores `{code, message}`).
+E1-T6 lista en código: `AppointmentController` (POST, GET por día o rango con estado, PUT reprogramar, PATCH estado),
+`AvailabilityController` (GET huecos por servicio), `ScheduleController` (GET/PUT horario de un día), DTOs `record`,
+`ApiExceptionHandler` (`{code, message}`; códigos de negocio → 404/409/400). Suite completa: 104 tests en verde (Docker encendido).
+Falta: OK para commit + push. Endpoints sin autenticación hasta E1-T7: la API se usa solo en local.
+Siguiente: E1-T7 (login de la dueña, CORS y validaciones de seguridad).
 
 ## Decisiones tomadas
+- 2026-11-18 (E1-T6): las respuestas de la API devuelven fechas en UTC (`Instant`); las peticiones aceptan fecha con zona horaria (`OffsetDateTime`), así que una hora sin zona se rechaza. El frontend muestra en `America/Bogota`.
+- 2026-11-18 (E1-T6): `Appointment.client` y `serviceType` pasan a carga ansiosa porque `open-in-view` está apagado y los DTOs se construyen fuera de la transacción.
+- 2026-11-18 (E1-T6): `PUT /api/schedule/days/{date}` guarda el override del día (abrir un domingo o cerrar un día); validación de horas y almuerzo en `ScheduleService`.
+- 2026-11-18 (E1-T6): la disponibilidad por servicio resuelve la duración en `AvailabilityService.freeSlotsForService`; los controladores no tocan repositorios.
+- 2026-11-18 (E1-T6): la consulta de citas por rango usa `[from, to)`; antes `findAllByStartAtBetween` incluía también el extremo final.
 - 2026-11-18 (E1-T5b): la hora de fin es opcional; si no viene, se usa la duración del servicio. La duración real por caso va en la cita (`REQUISITOS.md`).
 - 2026-11-18 (E1-T5b): la validación de disponibilidad (horario, almuerzo, solapes) vive en `AvailabilityService.isAvailable`, la misma lógica que muestra los huecos. Si la BD rechaza un solape por una carrera entre dos transacciones, `AppointmentService` lo traduce a `APPOINTMENT_NOT_AVAILABLE`.
 - 2026-11-18 (E1-T5b): errores de negocio con código: `APPOINTMENT_IN_PAST`, `APPOINTMENT_START_REQUIRED`, `APPOINTMENT_INVALID_RANGE`, `APPOINTMENT_NOT_AVAILABLE`, `APPOINTMENT_NOT_FOUND`, `APPOINTMENT_NOT_RESCHEDULABLE`, `INVALID_STATUS_TRANSITION`, `SERVICE_NOT_FOUND`.
@@ -46,6 +52,8 @@ Siguiente: E1-T6 (controladores REST + DTOs + manejo global de errores `{code, m
 - Clientes que pagan a fin de mes (cepillados semanales): posible cuentas por cobrar — fuera de alcance por ahora.
 
 ## Bitácora (más reciente arriba)
+- 2026-11-18 — E1-T6: controladores de citas, disponibilidad y horario; DTOs `record`; `ApiExceptionHandler`. 18 tests de servicio de citas, 16 de controladores (MockMvc), 6 de horario, 2 de disponibilidad, 1 de repositorio. Suite completa 104 verdes. Sin commit (pendiente de OK).
+- 2026-11-18 — E1-T5b commit `3ef8660` publicado.
 - 2026-11-18 — Auditoría de seguridad de herramientas y descargas: dependencias Maven (136) sin vulnerabilidades conocidas en OSV (control positivo verificado); imagen pgvector con 1 CVE alto sin parche en Debian (pam, EPSS 0,5 %); wrapper de Maven sin verificación de hash → añadido `distributionSha256Sum` (Maven 3.10.1 ya es la última estable); imagen de BD fijada por digest en `docker-compose.yml` y pruebas; Temurin 21.0.8 → 21.0.13 descargado y verificado por SHA-256, pendiente de instalación manual. Suite completa: 77 verdes. Extensión `dof.sql-tools-extenions` desinstalada y reemplazada por `ms-ossdata.vscode-pgsql` v1.34.0 (Microsoft, verificado). Contraseña por defecto retirada de `application.yml`: sin `DB_PASSWORD` el arranque falla con "password authentication failed" (documentado en `backend/README.md`). Pendiente manual: instalar `OpenJDK21U-jdk_x64_windows_hotspot_21.0.13_9.msi` (SHA-256 verificado) desde `%TEMP%\jdk-check`. Sin commit (pendiente de OK).
 - 2026-11-18 — E1-T5b: `AppointmentService` (crear, reprogramar, cancelar, marcar atendida/no asistió) + `AvailabilityService.isAvailable` + transiciones en `AppointmentStatus`. 16 unitarias de servicio + 6 de disponibilidad + 6 de integración con PostgreSQL; suite completa 77 verdes. Sin commit (pendiente de OK).
 - 2026-11-18 — E1-T5a commit `7ac2515` publicado.

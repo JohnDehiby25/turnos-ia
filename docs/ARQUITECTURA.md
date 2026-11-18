@@ -51,6 +51,7 @@ No: guardar citas ni calcular disponibilidad (eso es SQL exacto).
 | GET/POST | `/webhooks/whatsapp` | Verificación y mensajes entrantes |
 
 Respuestas de error uniformes: `{ "code": "...", "message": "..." }`.
+Fechas: las respuestas van en UTC; las peticiones deben incluir zona horaria (p. ej. `2026-11-19T09:00:00-05:00`).
 
 ## Frontend
 `frontend/src`: `pages/` (Hoy, Agenda, Disponibilidad, Chat, Ajustes), `components/`, `api/` (cliente tipado),

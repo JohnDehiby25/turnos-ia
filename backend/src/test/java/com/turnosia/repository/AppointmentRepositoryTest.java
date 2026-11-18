@@ -38,7 +38,7 @@ class AppointmentRepositoryTest {
 	private JdbcTemplate jdbc;
 
 	@Test
-	void findAllByStartAtBetween_returnsAppointmentsOrderedByStartAt() {
+	void findStartingBetween_returnsAppointmentsOrderedByStartAt() {
 		Client client = clientRepository.save(TestDataFactory.client("Ana", "Gómez", "3001234567"));
 		ServiceType mechas = serviceTypeRepository.save(TestDataFactory.serviceType("Mechas", 180));
 
@@ -49,12 +49,38 @@ class AppointmentRepositoryTest {
 		appointmentRepository.save(TestDataFactory.appointment(client, mechas,
 				OffsetDateTime.parse("2026-11-18T11:00:00Z"), OffsetDateTime.parse("2026-11-18T12:00:00Z")));
 
-		List<Appointment> result = appointmentRepository.findAllByStartAtBetweenOrderByStartAtAsc(
+		List<Appointment> result = appointmentRepository.findStartingBetween(
 				OffsetDateTime.parse("2026-11-18T08:00:00Z").toInstant(),
-				OffsetDateTime.parse("2026-11-18T13:30:00Z").toInstant());
+				OffsetDateTime.parse("2026-11-18T13:30:00Z").toInstant(), null);
 
 		assertThat(result).extracting(a -> a.getStartAt().toString())
 				.containsExactly("2026-11-18T09:00:00Z", "2026-11-18T11:00:00Z", "2026-11-18T13:00:00Z");
+	}
+
+	@Test
+	void findStartingBetween_filtersByStatusAndExcludesEndBoundary() {
+		Client client = clientRepository.save(TestDataFactory.client("Ana", "Gómez", "3001234567"));
+		ServiceType mechas = serviceTypeRepository.save(TestDataFactory.serviceType("Mechas", 180));
+
+		appointmentRepository.saveAndFlush(TestDataFactory.appointment(client, mechas,
+				OffsetDateTime.parse("2026-11-18T09:00:00Z"), OffsetDateTime.parse("2026-11-18T10:00:00Z")));
+		Appointment cancelled = appointmentRepository.saveAndFlush(TestDataFactory.appointment(client, mechas,
+				OffsetDateTime.parse("2026-11-18T10:30:00Z"), OffsetDateTime.parse("2026-11-18T11:00:00Z")));
+		jdbc.update("UPDATE appointment SET status = 'CANCELLED' WHERE id = ?", cancelled.getId());
+		appointmentRepository.saveAndFlush(TestDataFactory.appointment(client, mechas,
+				OffsetDateTime.parse("2026-11-18T11:00:00Z"), OffsetDateTime.parse("2026-11-18T12:00:00Z")));
+
+		List<Appointment> scheduled = appointmentRepository.findStartingBetween(
+				OffsetDateTime.parse("2026-11-18T08:00:00Z").toInstant(),
+				OffsetDateTime.parse("2026-11-18T11:00:00Z").toInstant(),
+				com.turnosia.domain.AppointmentStatus.SCHEDULED);
+		List<Appointment> all = appointmentRepository.findStartingBetween(
+				OffsetDateTime.parse("2026-11-18T08:00:00Z").toInstant(),
+				OffsetDateTime.parse("2026-11-18T11:00:00Z").toInstant(), null);
+
+		assertThat(scheduled).extracting(a -> a.getStartAt().toString()).containsExactly("2026-11-18T09:00:00Z");
+		assertThat(all).extracting(a -> a.getStartAt().toString())
+				.containsExactly("2026-11-18T09:00:00Z", "2026-11-18T10:30:00Z");
 	}
 
 	@Test

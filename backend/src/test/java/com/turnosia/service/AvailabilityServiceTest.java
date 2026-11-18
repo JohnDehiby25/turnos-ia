@@ -15,6 +15,7 @@ import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,7 @@ import com.turnosia.domain.Appointment;
 import com.turnosia.domain.Client;
 import com.turnosia.domain.ServiceType;
 import com.turnosia.repository.AppointmentRepository;
+import com.turnosia.repository.ServiceTypeRepository;
 
 @ExtendWith(MockitoExtension.class)
 class AvailabilityServiceTest {
@@ -40,6 +42,9 @@ class AvailabilityServiceTest {
 
 	@Mock
 	private AppointmentRepository appointmentRepository;
+
+	@Mock
+	private ServiceTypeRepository serviceTypeRepository;
 
 	private AvailabilityService availabilityService;
 
@@ -212,9 +217,28 @@ class AvailabilityServiceTest {
 		return OffsetDateTime.parse(offsetDateTime).toInstant();
 	}
 
+	@Test
+	void freeSlotsForService_usesServiceDuration() {
+		givenDay(WEDNESDAY, LocalTime.of(8, 0), LocalTime.of(10, 0));
+		when(serviceTypeRepository.findById(7L)).thenReturn(Optional.of(new ServiceType("Cepillado", 45, null)));
+
+		List<FreeSlot> slots = availabilityService.freeSlotsForService(WEDNESDAY, WEDNESDAY, 7L);
+
+		assertThat(slots).hasSize(6);
+	}
+
+	@Test
+	void freeSlotsForService_unknownService_throwsServiceNotFound() {
+		when(serviceTypeRepository.findById(99L)).thenReturn(Optional.empty());
+
+		assertThatThrownBy(() -> availabilityService.freeSlotsForService(WEDNESDAY, WEDNESDAY, 99L))
+				.isInstanceOfSatisfying(BusinessRuleException.class,
+						e -> assertThat(e.getCode()).isEqualTo("SERVICE_NOT_FOUND"));
+	}
+
 	private AvailabilityService serviceAt(Instant now) {
 		Clock clock = Clock.fixed(now, ZoneOffset.UTC);
-		return new AvailabilityService(scheduleService, appointmentRepository, clock);
+		return new AvailabilityService(scheduleService, appointmentRepository, serviceTypeRepository, clock);
 	}
 
 	private void givenDay(LocalDate day, LocalTime open, LocalTime close) {
@@ -226,7 +250,7 @@ class AvailabilityServiceTest {
 	}
 
 	private static Appointment busy(String start, String end) {
-		Client client = TestDataFactory.client("Ana", "Gómez", "3001234567");
+		Client client = TestDataFactory.client("Ana", "GÃ³mez", "3001234567");
 		ServiceType mechas = TestDataFactory.serviceType("Mechas", 180);
 		return TestDataFactory.appointment(client, mechas, OffsetDateTime.parse(start), OffsetDateTime.parse(end));
 	}

@@ -13,23 +13,36 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.turnosia.domain.Appointment;
+import com.turnosia.domain.ServiceType;
 import com.turnosia.repository.AppointmentRepository;
+import com.turnosia.repository.ServiceTypeRepository;
 
 @Service
 public class AvailabilityService {
 
-	private static final ZoneId ZONE = ZoneId.of("America/Bogota");
+	private static final ZoneId ZONE = BusinessTime.ZONE;
 	private static final Duration STEP = Duration.ofMinutes(15);
 
 	private final ScheduleService scheduleService;
 	private final AppointmentRepository appointmentRepository;
+	private final ServiceTypeRepository serviceTypeRepository;
 	private final Clock clock;
 
 	public AvailabilityService(ScheduleService scheduleService, AppointmentRepository appointmentRepository,
-			Clock clock) {
+			ServiceTypeRepository serviceTypeRepository, Clock clock) {
 		this.scheduleService = scheduleService;
 		this.appointmentRepository = appointmentRepository;
+		this.serviceTypeRepository = serviceTypeRepository;
 		this.clock = clock;
+	}
+
+	@Transactional(readOnly = true)
+	public List<FreeSlot> freeSlotsForService(LocalDate from, LocalDate to, Long serviceTypeId) {
+		ServiceType service = serviceTypeRepository.findById(serviceTypeId)
+				.filter(ServiceType::isActive)
+				.orElseThrow(() -> new BusinessRuleException("SERVICE_NOT_FOUND",
+						"El servicio no existe o está inactivo"));
+		return freeSlots(from, to, Duration.ofMinutes(service.getDurationMin()));
 	}
 
 	@Transactional(readOnly = true)

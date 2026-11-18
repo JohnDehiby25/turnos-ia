@@ -6,6 +6,7 @@ classDiagram
 
     class AppointmentController
     class ScheduleController
+    class AvailabilityController
     class ServicesController
     class AppointmentService
     class AvailabilityService
@@ -34,6 +35,8 @@ classDiagram
 
     AppointmentController --> AppointmentService : usa
     ScheduleController --> ScheduleService : usa
+    AvailabilityController --> AvailabilityService : usa
+    AvailabilityService --> ServiceTypeRepository : duración del servicio
     ServicesController --> ServiceCatalogService : usa
     AppointmentService --> AvailabilityService : consulta huecos
     AppointmentService --> ScheduleService : valida horario
@@ -61,6 +64,7 @@ classDiagram
     classDef domain fill:#E6E6FA,stroke:#333,stroke-width:2px,color:darkblue
     class AppointmentController controller
     class ScheduleController controller
+    class AvailabilityController controller
     class ServicesController controller
     class AppointmentService service
     class AvailabilityService service

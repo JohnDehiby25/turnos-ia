@@ -2,6 +2,7 @@ package com.turnosia.service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -36,6 +37,42 @@ public class ScheduleService {
 		return workingHoursRepository.findByWeekday(date.getDayOfWeek())
 				.map(workingHours -> fromWorkingHours(date, workingHours))
 				.orElseGet(() -> DaySchedule.closed(date));
+	}
+
+	@Transactional
+	public DaySchedule saveOverride(LocalDate date, boolean open, LocalTime openTime, LocalTime closeTime,
+			LocalTime lunchStart, LocalTime lunchEnd, String note) {
+		if (!open) {
+			dayOverrideRepository.save(new DayOverride(date, false, null, null, null, null, note));
+			return DaySchedule.closed(date);
+		}
+		requireValidWindow(openTime, closeTime);
+		requireValidLunch(openTime, closeTime, lunchStart, lunchEnd);
+		DayOverride override = new DayOverride(date, true, openTime, closeTime, lunchStart, lunchEnd, note);
+		dayOverrideRepository.save(override);
+		return fromOverride(date, override);
+	}
+
+	private static void requireValidWindow(LocalTime openTime, LocalTime closeTime) {
+		if (openTime == null || closeTime == null) {
+			throw new BusinessRuleException("SCHEDULE_TIMES_REQUIRED",
+					"Un día abierto necesita hora de apertura y de cierre");
+		}
+		if (!openTime.isBefore(closeTime)) {
+			throw new BusinessRuleException("SCHEDULE_INVALID_RANGE", "La apertura debe ser anterior al cierre");
+		}
+	}
+
+	private static void requireValidLunch(LocalTime openTime, LocalTime closeTime, LocalTime lunchStart,
+			LocalTime lunchEnd) {
+		if (lunchStart == null && lunchEnd == null) {
+			return;
+		}
+		if (lunchStart == null || lunchEnd == null || !lunchStart.isBefore(lunchEnd)
+				|| lunchStart.isBefore(openTime) || lunchEnd.isAfter(closeTime)) {
+			throw new BusinessRuleException("SCHEDULE_LUNCH_INVALID",
+					"El almuerzo necesita inicio y fin válidos, dentro del horario del día");
+		}
 	}
 
 	private static DaySchedule fromOverride(LocalDate date, DayOverride override) {

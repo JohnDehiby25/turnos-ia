@@ -1,6 +1,10 @@
 package com.turnosia.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.DayOfWeek;
@@ -116,6 +120,58 @@ class ScheduleServiceTest {
 		assertThat(schedule.open()).isTrue();
 		assertThat(schedule.lunchStart()).isNull();
 		assertThat(schedule.lunchEnd()).isNull();
+	}
+
+	@Test
+	void saveOverride_openWithValidTimes_savesOverrideAndReturnsOpenDay() {
+		DaySchedule schedule = scheduleService.saveOverride(SUNDAY, true, LocalTime.of(9, 0), LocalTime.of(14, 0),
+				null, null, "Domingo confirmado");
+
+		verify(dayOverrideRepository).save(any(DayOverride.class));
+		assertThat(schedule.open()).isTrue();
+		assertThat(schedule.closeTime()).isEqualTo(LocalTime.of(14, 0));
+	}
+
+	@Test
+	void saveOverride_closed_savesClosedAndIgnoresTimes() {
+		DaySchedule schedule = scheduleService.saveOverride(WEDNESDAY, false, LocalTime.of(9, 0),
+				LocalTime.of(14, 0), null, null, "Festivo");
+
+		verify(dayOverrideRepository).save(any(DayOverride.class));
+		assertThat(schedule.open()).isFalse();
+		assertThat(schedule.openTime()).isNull();
+	}
+
+	@Test
+	void saveOverride_openWithoutTimes_throwsTimesRequired() {
+		assertThatThrownBy(() -> scheduleService.saveOverride(SUNDAY, true, null, null, null, null, null))
+				.isInstanceOfSatisfying(BusinessRuleException.class,
+						e -> assertThat(e.getCode()).isEqualTo("SCHEDULE_TIMES_REQUIRED"));
+		verify(dayOverrideRepository, never()).save(any(DayOverride.class));
+	}
+
+	@Test
+	void saveOverride_closeNotAfterOpen_throwsInvalidRange() {
+		assertThatThrownBy(() -> scheduleService.saveOverride(SUNDAY, true, LocalTime.of(14, 0),
+				LocalTime.of(9, 0), null, null, null))
+				.isInstanceOfSatisfying(BusinessRuleException.class,
+						e -> assertThat(e.getCode()).isEqualTo("SCHEDULE_INVALID_RANGE"));
+	}
+
+	@Test
+	void saveOverride_lunchOutsideWorkingHours_throwsLunchInvalid() {
+		assertThatThrownBy(() -> scheduleService.saveOverride(SUNDAY, true, LocalTime.of(9, 0),
+				LocalTime.of(14, 0), LocalTime.of(13, 0), LocalTime.of(15, 0), null))
+				.isInstanceOfSatisfying(BusinessRuleException.class,
+						e -> assertThat(e.getCode()).isEqualTo("SCHEDULE_LUNCH_INVALID"));
+	}
+
+	@Test
+	void saveOverride_lunchWithoutEnd_throwsLunchInvalid() {
+		assertThatThrownBy(() -> scheduleService.saveOverride(SUNDAY, true, LocalTime.of(9, 0),
+				LocalTime.of(14, 0), LocalTime.of(12, 0), null, null))
+				.isInstanceOfSatisfying(BusinessRuleException.class,
+						e -> assertThat(e.getCode()).isEqualTo("SCHEDULE_LUNCH_INVALID"));
 	}
 
 	private static WorkingHours openWorkingHours(DayOfWeek weekday) {

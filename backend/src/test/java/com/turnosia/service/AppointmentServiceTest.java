@@ -10,7 +10,9 @@ import static org.mockito.Mockito.when;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -227,6 +229,24 @@ class AppointmentServiceTest {
 		assertThatThrownBy(() -> appointmentService.cancel(APPOINTMENT_ID))
 				.isInstanceOfSatisfying(BusinessRuleException.class,
 						e -> assertThat(e.getCode()).isEqualTo("APPOINTMENT_NOT_FOUND"));
+	}
+
+	@Test
+	void listBetween_convertsBogotaDaysToUtcRange() {
+		when(appointmentRepository.findStartingBetween(any(), any(), any())).thenReturn(List.of());
+
+		appointmentService.listBetween(LocalDate.of(2026, 11, 18), LocalDate.of(2026, 11, 18), null);
+
+		verify(appointmentRepository).findStartingBetween(
+				Instant.parse("2026-11-18T05:00:00Z"), Instant.parse("2026-11-19T05:00:00Z"), null);
+	}
+
+	@Test
+	void listBetween_reversedRange_throwsInvalidRange() {
+		assertThatThrownBy(() -> appointmentService.listBetween(LocalDate.of(2026, 11, 19),
+				LocalDate.of(2026, 11, 18), null))
+				.isInstanceOfSatisfying(BusinessRuleException.class,
+						e -> assertThat(e.getCode()).isEqualTo("APPOINTMENT_INVALID_RANGE"));
 	}
 
 	private void givenService() {

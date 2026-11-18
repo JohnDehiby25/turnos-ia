@@ -26,7 +26,7 @@ Estimación en "sesiones" (1 sesión ≈ 2 h). Ritmo: 4–5 h por semana (≈ 2 
 - [x] E1-T4 `AvailabilityService` (huecos por rango y duración) + tests
 - [x] E1-T5a Cliente: nombre y apellido obligatorios, teléfono opcional (V2), `ClientService.resolveClient` (homónimos piden teléfono) + tests
 - [x] E1-T5b `AppointmentService` (crear, cancelar, reprogramar, estados, sin solapamientos; usa `ClientService`) + tests
-- [ ] E1-T6 Controladores REST + DTOs + manejo global de errores + tests MockMvc
+- [x] E1-T6 Controladores REST + DTOs + manejo global de errores + tests MockMvc
 - [ ] E1-T7 Seguridad: login de la dueña (BCrypt + JWT o sesión), CORS, validaciones
 - [ ] E1-T8 Precios: `ServiceCatalogService`, `GET/PUT /api/services`, `price_charged` al crear cita + tests (solo después de E1-T1..T7)
 - [ ] E1-T9 Estadísticas: `StatsService` + `GET /api/stats/summary` (día/semana/mes, dinero ganado/proyectado/no percibido) + tests

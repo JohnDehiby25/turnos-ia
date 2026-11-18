@@ -3,6 +3,8 @@ package com.turnosia.service;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -58,6 +60,21 @@ public class AppointmentService {
 		requireAvailable(start, effectiveEnd, appointmentId);
 		appointment.reschedule(start, effectiveEnd, clock.instant());
 		return saveWithoutOverlap(appointment);
+	}
+
+	@Transactional(readOnly = true)
+	public List<Appointment> listBetween(LocalDate from, LocalDate to, AppointmentStatus status) {
+		if (to.isBefore(from)) {
+			throw new BusinessRuleException("APPOINTMENT_INVALID_RANGE", "La fecha final no puede ser anterior a la inicial");
+		}
+		Instant start = from.atStartOfDay(BusinessTime.ZONE).toInstant();
+		Instant end = to.plusDays(1).atStartOfDay(BusinessTime.ZONE).toInstant();
+		return appointmentRepository.findStartingBetween(start, end, status);
+	}
+
+	@Transactional
+	public Appointment changeStatus(Long appointmentId, AppointmentStatus target) {
+		return transition(appointmentId, target);
 	}
 
 	@Transactional
