@@ -5,7 +5,7 @@ CREATE TABLE client (
     id         BIGSERIAL PRIMARY KEY,
     name       VARCHAR(120) NOT NULL,
     phone      VARCHAR(20)  NOT NULL UNIQUE,
-    created_at TIMESTAMPTZ  NOT NULL DEFAULT now()
+    created_at TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE service_type (
@@ -27,8 +27,8 @@ CREATE TABLE appointment (
     price_charged   NUMERIC(12, 2) NULL, -- precio real de la cita (por caso)
     tip             NUMERIC(12, 2) NULL, -- propina opcional
     notes           TEXT,
-    created_at      TIMESTAMPTZ   NOT NULL DEFAULT now(),
-    updated_at      TIMESTAMPTZ   NOT NULL DEFAULT now(),
+    created_at      TIMESTAMPTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMPTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT appointment_end_after_start CHECK (end_at > start_at)
 );
 

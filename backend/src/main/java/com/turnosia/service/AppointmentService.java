@@ -108,10 +108,16 @@ public class AppointmentService {
 	}
 
 	private ServiceType activeService(Long serviceTypeId) {
-		return serviceTypeRepository.findById(serviceTypeId)
-				.filter(ServiceType::isActive)
-				.orElseThrow(() -> new BusinessRuleException("SERVICE_NOT_FOUND",
-						"El servicio no existe o está inactivo"));
+		ServiceType service = serviceTypeRepository.findById(serviceTypeId)
+				.orElseThrow(AppointmentService::serviceNotFound);
+		if (!service.isActive()) {
+			throw serviceNotFound();
+		}
+		return service;
+	}
+
+	private static BusinessRuleException serviceNotFound() {
+		return new BusinessRuleException("SERVICE_NOT_FOUND", "El servicio no existe o está inactivo");
 	}
 
 	private static Duration durationOf(ServiceType service) {

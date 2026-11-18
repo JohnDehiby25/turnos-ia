@@ -100,4 +100,30 @@ class SecurityIntegrationTest {
 				.content("{\"username\":\"admin\",\"password\":\"" + PASSWORD + "\"}"))
 				.andExpect(status().isForbidden());
 	}
+
+	@Test
+	void unknownRoute_returnsUniformNotFoundError() throws Exception {
+		MockHttpSession session = login();
+
+		mockMvc.perform(get("/api/ruta-inexistente").session(session))
+				.andExpect(status().isNotFound())
+				.andExpect(jsonPath("$.code").value("NOT_FOUND"));
+	}
+
+	@Test
+	void unimplementedMethod_returnsUniform405() throws Exception {
+		MockHttpSession session = login();
+
+		mockMvc.perform(get("/api/appointments/5").session(session))
+				.andExpect(status().isMethodNotAllowed())
+				.andExpect(jsonPath("$.code").value("METHOD_NOT_ALLOWED"));
+	}
+
+	private MockHttpSession login() throws Exception {
+		MvcResult result = mockMvc.perform(post("/api/auth/login").with(csrf()).contentType(APPLICATION_JSON)
+				.content("{\"username\":\"admin\",\"password\":\"" + PASSWORD + "\"}"))
+				.andExpect(status().isOk())
+				.andReturn();
+		return (MockHttpSession) result.getRequest().getSession(false);
+	}
 }

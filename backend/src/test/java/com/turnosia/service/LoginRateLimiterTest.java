@@ -8,9 +8,12 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import com.turnosia.config.AppProperties;
 
 class LoginRateLimiterTest {
 
@@ -23,7 +26,7 @@ class LoginRateLimiterTest {
 	@BeforeEach
 	void setUp() {
 		clock = new MutableClock(Instant.parse("2026-11-18T14:00:00Z"));
-		rateLimiter = new LoginRateLimiter(clock, 3, 15, 15);
+		rateLimiter = new LoginRateLimiter(clock, loginProperties(3, 15, 15));
 	}
 
 	@Test
@@ -98,6 +101,13 @@ class LoginRateLimiterTest {
 		rateLimiter.recordFailure(USERNAME, IP);
 
 		rateLimiter.checkAllowed(USERNAME, IP);
+	}
+
+	private static AppProperties loginProperties(int maxAttempts, long windowMinutes, long lockoutMinutes) {
+		return new AppProperties(
+				new AppProperties.Security(new AppProperties.Security.Cors(List.of()),
+						new AppProperties.Security.Login(maxAttempts, windowMinutes, lockoutMinutes)),
+				new AppProperties.Admin("admin", ""));
 	}
 
 	private static final class MutableClock extends Clock {

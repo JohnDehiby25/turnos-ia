@@ -16,7 +16,7 @@ import com.turnosia.service.ScheduleService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/schedule/days")
+@RequestMapping("/api/schedule/days/{date}")
 public class ScheduleController {
 
 	private final ScheduleService scheduleService;
@@ -25,12 +25,12 @@ public class ScheduleController {
 		this.scheduleService = scheduleService;
 	}
 
-	@GetMapping("/{date}")
+	@GetMapping
 	public DayScheduleResponse day(@PathVariable LocalDate date) {
 		return DayScheduleResponse.from(scheduleService.scheduleFor(date));
 	}
 
-	@PutMapping("/{date}")
+	@PutMapping
 	public DayScheduleResponse saveOverride(@PathVariable LocalDate date,
 			@Valid @RequestBody DayScheduleRequest request) {
 		return DayScheduleResponse.from(scheduleService.saveOverride(date, request.open(), request.openTime(),

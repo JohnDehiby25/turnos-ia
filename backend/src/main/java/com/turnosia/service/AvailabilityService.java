@@ -39,10 +39,15 @@ public class AvailabilityService {
 	@Transactional(readOnly = true)
 	public List<FreeSlot> freeSlotsForService(LocalDate from, LocalDate to, Long serviceTypeId) {
 		ServiceType service = serviceTypeRepository.findById(serviceTypeId)
-				.filter(ServiceType::isActive)
-				.orElseThrow(() -> new BusinessRuleException("SERVICE_NOT_FOUND",
-						"El servicio no existe o está inactivo"));
+				.orElseThrow(AvailabilityService::serviceNotFound);
+		if (!service.isActive()) {
+			throw serviceNotFound();
+		}
 		return freeSlots(from, to, Duration.ofMinutes(service.getDurationMin()));
+	}
+
+	private static BusinessRuleException serviceNotFound() {
+		return new BusinessRuleException("SERVICE_NOT_FOUND", "El servicio no existe o está inactivo");
 	}
 
 	@Transactional(readOnly = true)

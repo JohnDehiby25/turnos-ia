@@ -26,7 +26,7 @@ public class AuthService {
 			return authentication;
 		} catch (AuthenticationException e) {
 			rateLimiter.recordFailure(username, clientIp);
-			throw new BusinessRuleException("INVALID_CREDENTIALS", "Usuario o contraseña incorrectos");
+			throw new BusinessRuleException("INVALID_CREDENTIALS", "Usuario o contraseña incorrectos", e);
 		}
 	}
 }

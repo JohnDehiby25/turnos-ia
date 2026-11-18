@@ -6,8 +6,9 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import com.turnosia.config.AppProperties;
 
 /**
  * Limita los intentos fallidos de login para frenar la fuerza bruta. Cuenta por
@@ -23,13 +24,12 @@ public class LoginRateLimiter {
 
 	private final Map<String, Attempts> attempts = new ConcurrentHashMap<>();
 
-	public LoginRateLimiter(Clock clock, @Value("${app.security.login.max-attempts:5}") int maxAttempts,
-			@Value("${app.security.login.window-minutes:15}") long windowMinutes,
-			@Value("${app.security.login.lockout-minutes:15}") long lockoutMinutes) {
+	public LoginRateLimiter(Clock clock, AppProperties properties) {
+		AppProperties.Security.Login login = properties.security().login();
 		this.clock = clock;
-		this.maxAttempts = maxAttempts;
-		this.window = Duration.ofMinutes(windowMinutes);
-		this.lockout = Duration.ofMinutes(lockoutMinutes);
+		this.maxAttempts = login.maxAttempts();
+		this.window = Duration.ofMinutes(login.windowMinutes());
+		this.lockout = Duration.ofMinutes(login.lockoutMinutes());
 	}
 
 	/** Lanza {@link BusinessRuleException} si el usuario o la IP están bloqueados. */

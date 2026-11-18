@@ -1,10 +1,8 @@
 package com.turnosia.config;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -66,14 +64,9 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	CorsConfigurationSource corsConfigurationSource(
-			@Value("${app.security.cors.allowed-origins:http://localhost:5173}") String allowedOrigins) {
-		List<String> origins = Arrays.stream(allowedOrigins.split(","))
-				.map(String::trim)
-				.filter(origin -> !origin.isEmpty())
-				.toList();
+	CorsConfigurationSource corsConfigurationSource(AppProperties properties) {
 		CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowedOrigins(origins);
+		configuration.setAllowedOrigins(properties.security().cors().allowedOrigins());
 		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
 		configuration.setAllowedHeaders(List.of("Content-Type", "X-XSRF-TOKEN"));
 		configuration.setAllowCredentials(true);

@@ -1,10 +1,10 @@
 package com.turnosia.service;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.turnosia.config.AppProperties;
 import com.turnosia.domain.AppUser;
 import com.turnosia.repository.AppUserRepository;
 
@@ -22,12 +22,11 @@ public class AdminUserService {
 	private final String password;
 
 	public AdminUserService(AppUserRepository appUserRepository, PasswordEncoder passwordEncoder,
-			@Value("${app.admin.username:admin}") String username,
-			@Value("${app.admin.password:}") String password) {
+			AppProperties properties) {
 		this.appUserRepository = appUserRepository;
 		this.passwordEncoder = passwordEncoder;
-		this.username = username;
-		this.password = password;
+		this.username = properties.admin().username();
+		this.password = properties.admin().password();
 	}
 
 	@Transactional

@@ -42,7 +42,7 @@ class ServiceTypeRepositoryTest {
 
 		assertThat(serviceTypeRepository.findById(saved.getId()))
 				.get()
-				.extracting(ServiceType::getPrice)
+				.extracting("price")
 				.isEqualTo(new BigDecimal("35000.00"));
 	}
 

@@ -6,6 +6,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.turnosia.config.AppProperties;
 import com.turnosia.domain.AppUser;
 import com.turnosia.repository.AppUserRepository;
 
@@ -32,9 +34,17 @@ class AdminUserServiceTest {
 		passwordEncoder = new BCryptPasswordEncoder();
 	}
 
+	private static AppProperties adminProperties(String username, String password) {
+		return new AppProperties(
+				new AppProperties.Security(new AppProperties.Security.Cors(List.of()),
+						new AppProperties.Security.Login(5, 15, 15)),
+				new AppProperties.Admin(username, password));
+	}
+
 	@Test
 	void syncFromEnvironment_blankPassword_doesNotTouchRepository() {
-		AdminUserService service = new AdminUserService(appUserRepository, passwordEncoder, "admin", "  ");
+		AdminUserService service = new AdminUserService(appUserRepository, passwordEncoder,
+				adminProperties("admin", "  "));
 
 		service.syncFromEnvironment();
 
@@ -45,7 +55,8 @@ class AdminUserServiceTest {
 	@Test
 	void syncFromEnvironment_userDoesNotExist_createsAdminWithHashedPassword() {
 		when(appUserRepository.findByUsername("admin")).thenReturn(Optional.empty());
-		AdminUserService service = new AdminUserService(appUserRepository, passwordEncoder, "admin", "secreta123");
+		AdminUserService service = new AdminUserService(appUserRepository, passwordEncoder,
+				adminProperties("admin", "secreta123"));
 
 		service.syncFromEnvironment();
 
@@ -62,7 +73,8 @@ class AdminUserServiceTest {
 	void syncFromEnvironment_userExists_updatesPasswordHash() {
 		AppUser existing = new AppUser("admin", "hash-anterior", "ADMIN");
 		when(appUserRepository.findByUsername("admin")).thenReturn(Optional.of(existing));
-		AdminUserService service = new AdminUserService(appUserRepository, passwordEncoder, "admin", "nueva-clave");
+		AdminUserService service = new AdminUserService(appUserRepository, passwordEncoder,
+				adminProperties("admin", "nueva-clave"));
 
 		service.syncFromEnvironment();
 

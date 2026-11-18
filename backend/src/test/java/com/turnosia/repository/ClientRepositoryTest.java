@@ -71,6 +71,6 @@ class ClientRepositoryTest {
 
 		List<Client> result = clientRepository.findAllByFirstNameIgnoreCaseAndLastNameIgnoreCase("ANA", "gomez");
 
-		assertThat(result).extracting(Client::getPhone).containsExactly("3001234567");
+		assertThat(result).extracting("phone").containsExactly("3001234567");
 	}
 }
