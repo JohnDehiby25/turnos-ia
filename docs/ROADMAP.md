@@ -1,22 +1,22 @@
 # Roadmap y planning por etapas
 
 Reglas: una tarea a la vez · cada etapa termina en una **puerta de salida** que yo apruebo · web primero, mobile al final.
-Estimación en "sesiones" (1 sesión ≈ 2 h). Las fechas se llenan en E0-T3 según mis horas libres por semana.
+Estimación en "sesiones" (1 sesión ≈ 2 h). Ritmo: 4–5 h por semana (≈ 2 sesiones/semana). Fechas objetivo llenadas en E0-T3.
 
 | Etapa | Objetivo | Sesiones aprox. | Fecha objetivo |
 |---|---|---|---|
-| E0 | Preparación | 1 | ____ |
-| E1 | Backend núcleo (sin IA) + precios y resumen | 7–8 | ____ |
-| E2 | Panel web (turnos, precios, resumen) | 6–8 | ____ |
-| E3 | IA: chat web + vectorial | 4–5 | ____ |
-| E4 | Nube: Docker, dominio, CI | 2–3 | ____ |
-| E5 | WhatsApp | 3–4 | ____ |
-| E6 | Mobile | 4–6 | ____ |
+| E0 | Preparación | 1 | 2026-11-22 |
+| E1 | Backend núcleo (sin IA) + precios y resumen | 7–8 | 2026-12-20 |
+| E2 | Panel web (turnos, precios, resumen) | 6–8 | 2027-01-17 |
+| E3 | IA: chat web + vectorial | 4–5 | 2027-02-07 |
+| E4 | Nube: Docker, dominio, CI | 2–3 | 2027-02-21 |
+| E5 | WhatsApp | 3–4 | 2027-03-07 |
+| E6 | Mobile | 4–6 | 2027-03-28 |
 
 ## E0 — Preparación
 - [x] E0-T1 Repo GitHub, estructura, `.gitignore`, `.env.example`, ramas (`main` + `feature/*`)
 - [x] E0-T2 Resolver preguntas abiertas de `REQUISITOS.md` con la dueña
-- [ ] E0-T3 Definir mis horas por semana y llenar fechas objetivo de esta tabla
+- [x] E0-T3 Definir mis horas por semana y llenar fechas objetivo de esta tabla
 **Puerta:** repo limpio en GitHub + preguntas abiertas respondidas.
 
 ## E1 — Backend núcleo (sin IA)
