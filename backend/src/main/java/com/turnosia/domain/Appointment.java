@@ -70,6 +70,17 @@ public class Appointment {
 		this.updatedAt = this.createdAt;
 	}
 
+	public void changeStatus(AppointmentStatus next, Instant now) {
+		this.status = next;
+		this.updatedAt = now;
+	}
+
+	public void reschedule(Instant newStartAt, Instant newEndAt, Instant now) {
+		this.startAt = newStartAt;
+		this.endAt = newEndAt;
+		this.updatedAt = now;
+	}
+
 	public Long getId() {
 		return id;
 	}

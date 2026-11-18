@@ -154,6 +154,64 @@ class AvailabilityServiceTest {
 				.isInstanceOf(IllegalArgumentException.class);
 	}
 
+	@Test
+	void isAvailable_freeSlotInsideWorkingHours_returnsTrue() {
+		givenDay(WEDNESDAY, LocalTime.of(8, 0), LocalTime.of(18, 0));
+
+		assertThat(availabilityService.isAvailable(at("2026-11-18T09:00-05:00"), at("2026-11-18T10:00-05:00"), null))
+				.isTrue();
+	}
+
+	@Test
+	void isAvailable_outsideWorkingHours_returnsFalse() {
+		givenDay(WEDNESDAY, LocalTime.of(8, 0), LocalTime.of(18, 0));
+
+		assertThat(availabilityService.isAvailable(at("2026-11-18T07:30-05:00"), at("2026-11-18T08:30-05:00"), null))
+				.isFalse();
+		assertThat(availabilityService.isAvailable(at("2026-11-18T17:30-05:00"), at("2026-11-18T18:30-05:00"), null))
+				.isFalse();
+	}
+
+	@Test
+	void isAvailable_overlappingLunch_returnsFalse() {
+		when(scheduleService.scheduleFor(WEDNESDAY)).thenReturn(
+				new DaySchedule(WEDNESDAY, true, LocalTime.of(8, 0), LocalTime.of(18, 0),
+						LocalTime.of(12, 0), LocalTime.of(13, 0)));
+
+		assertThat(availabilityService.isAvailable(at("2026-11-18T11:30-05:00"), at("2026-11-18T12:30-05:00"), null))
+				.isFalse();
+	}
+
+	@Test
+	void isAvailable_overlappingAppointment_returnsFalse() {
+		givenDay(WEDNESDAY, LocalTime.of(8, 0), LocalTime.of(18, 0));
+		givenAppointments(busy("2026-11-18T09:00-05:00", "2026-11-18T10:00-05:00"));
+
+		assertThat(availabilityService.isAvailable(at("2026-11-18T09:30-05:00"), at("2026-11-18T10:30-05:00"), null))
+				.isFalse();
+	}
+
+	@Test
+	void isAvailable_startingWhenAnotherEnds_returnsTrue() {
+		givenDay(WEDNESDAY, LocalTime.of(8, 0), LocalTime.of(18, 0));
+		givenAppointments(busy("2026-11-18T09:00-05:00", "2026-11-18T10:00-05:00"));
+
+		assertThat(availabilityService.isAvailable(at("2026-11-18T10:00-05:00"), at("2026-11-18T11:00-05:00"), null))
+				.isTrue();
+	}
+
+	@Test
+	void isAvailable_closedDay_returnsFalse() {
+		when(scheduleService.scheduleFor(WEDNESDAY)).thenReturn(DaySchedule.closed(WEDNESDAY));
+
+		assertThat(availabilityService.isAvailable(at("2026-11-18T09:00-05:00"), at("2026-11-18T10:00-05:00"), null))
+				.isFalse();
+	}
+
+	private static Instant at(String offsetDateTime) {
+		return OffsetDateTime.parse(offsetDateTime).toInstant();
+	}
+
 	private AvailabilityService serviceAt(Instant now) {
 		Clock clock = Clock.fixed(now, ZoneOffset.UTC);
 		return new AvailabilityService(scheduleService, appointmentRepository, clock);

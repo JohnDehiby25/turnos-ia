@@ -44,6 +44,25 @@ public class AvailabilityService {
 		return slots;
 	}
 
+	/**
+	 * Indica si [start, end) cabe dentro del horario del día, fuera del almuerzo y sin
+	 * solapar citas no canceladas. {@code ignoredAppointmentId} excluye la propia cita al reprogramarla.
+	 */
+	@Transactional(readOnly = true)
+	public boolean isAvailable(Instant start, Instant end, Long ignoredAppointmentId) {
+		LocalDate day = start.atZone(ZONE).toLocalDate();
+		DaySchedule schedule = scheduleService.scheduleFor(day);
+		if (!schedule.open()) {
+			return false;
+		}
+		Instant open = toInstant(day, schedule.openTime());
+		Instant close = toInstant(day, schedule.closeTime());
+		if (start.isBefore(open) || end.isAfter(close)) {
+			return false;
+		}
+		return isFree(start, end, busyPeriods(day, schedule, open, close, ignoredAppointmentId));
+	}
+
 	private List<FreeSlot> freeSlotsOn(LocalDate day, Duration duration) {
 		DaySchedule schedule = scheduleService.scheduleFor(day);
 		if (!schedule.open()) {
@@ -51,7 +70,7 @@ public class AvailabilityService {
 		}
 		Instant open = toInstant(day, schedule.openTime());
 		Instant close = toInstant(day, schedule.closeTime());
-		List<BusyPeriod> busy = busyPeriods(day, schedule, open, close);
+		List<BusyPeriod> busy = busyPeriods(day, schedule, open, close, null);
 		Instant now = clock.instant();
 
 		List<FreeSlot> slots = new ArrayList<>();
@@ -64,13 +83,16 @@ public class AvailabilityService {
 		return slots;
 	}
 
-	private List<BusyPeriod> busyPeriods(LocalDate day, DaySchedule schedule, Instant open, Instant close) {
+	private List<BusyPeriod> busyPeriods(LocalDate day, DaySchedule schedule, Instant open, Instant close,
+			Long ignoredAppointmentId) {
 		List<BusyPeriod> busy = new ArrayList<>();
 		if (schedule.lunchStart() != null && schedule.lunchEnd() != null) {
 			busy.add(new BusyPeriod(toInstant(day, schedule.lunchStart()), toInstant(day, schedule.lunchEnd())));
 		}
 		for (Appointment appointment : appointmentRepository.findNotCancelledOverlapping(open, close)) {
-			busy.add(new BusyPeriod(appointment.getStartAt(), appointment.getEndAt()));
+			if (ignoredAppointmentId == null || !ignoredAppointmentId.equals(appointment.getId())) {
+				busy.add(new BusyPeriod(appointment.getStartAt(), appointment.getEndAt()));
+			}
 		}
 		return busy;
 	}

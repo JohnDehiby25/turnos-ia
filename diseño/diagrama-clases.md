@@ -38,6 +38,7 @@ classDiagram
     AppointmentService --> AvailabilityService : consulta huecos
     AppointmentService --> ScheduleService : valida horario
     AppointmentService --> AppointmentRepository
+    AppointmentService --> ServiceTypeRepository
     AppointmentService --> ClientService : resuelve cliente
     AvailabilityService --> AppointmentRepository
     AvailabilityService --> ScheduleService : horario del día

@@ -2,17 +2,25 @@
 
 ## Estado actual
 - Etapa: E1 — Backend núcleo (sin IA)
-- Última tarea terminada: E1-T4 (commit `837256c`, publicado en GitHub)
-- Tarea en curso: E1-T5a (cliente) terminada en código y pruebas; pendiente de OK del usuario para commit
-- Próxima tarea: E1-T5b (`AppointmentService`)
+- Última tarea terminada: E1-T5a (commit `7ac2515`, publicado en GitHub)
+- Tarea en curso: E1-T5b (`AppointmentService`) terminada en código y pruebas; pendiente de OK del usuario para commit
+- Próxima tarea: E1-T6 (controladores REST, DTOs, manejo de errores, tests MockMvc) — pendiente de confirmar
 
 ## Punto de control
-E1-T5a lista en código: V2 (`client`: `first_name`, `last_name`, `phone` opcional), `Client`, `ClientService.resolveClient`
-(homónimos piden teléfono; teléfono ya usado por otro cliente = error de negocio), `BusinessRuleException`.
-Suite completa: 49 tests en verde (Docker encendido). Falta: OK para commit + push.
-Siguiente: E1-T5b (`AppointmentService`: crear, cancelar, reprogramar, estados, sin solapamientos; usa `ClientService`).
+E1-T5b lista en código: `AppointmentService` (crear, reprogramar, cancelar, `markAttended`, `markNoShow`), `AvailabilityService.isAvailable`,
+`AppointmentStatus.canTransitionTo`, métodos `changeStatus`/`reschedule` en `Appointment`. Suite completa: 77 tests en verde
+(Docker encendido), incluidas 6 de integración con PostgreSQL real. Falta: OK para commit + push.
+Siguiente: E1-T6 (controladores REST + DTOs + manejo global de errores `{code, message}`).
 
 ## Decisiones tomadas
+- 2026-11-18 (E1-T5b): la hora de fin es opcional; si no viene, se usa la duración del servicio. La duración real por caso va en la cita (`REQUISITOS.md`).
+- 2026-11-18 (E1-T5b): la validación de disponibilidad (horario, almuerzo, solapes) vive en `AvailabilityService.isAvailable`, la misma lógica que muestra los huecos. Si la BD rechaza un solape por una carrera entre dos transacciones, `AppointmentService` lo traduce a `APPOINTMENT_NOT_AVAILABLE`.
+- 2026-11-18 (E1-T5b): errores de negocio con código: `APPOINTMENT_IN_PAST`, `APPOINTMENT_START_REQUIRED`, `APPOINTMENT_INVALID_RANGE`, `APPOINTMENT_NOT_AVAILABLE`, `APPOINTMENT_NOT_FOUND`, `APPOINTMENT_NOT_RESCHEDULABLE`, `INVALID_STATUS_TRANSITION`, `SERVICE_NOT_FOUND`.
+- 2026-11-18 (E1-T5b): reprogramar solo aplica a citas `SCHEDULED`; reprogramar a un horario que solapa la propia cita original está permitido.
+- 2026-11-18 (E1-T5a): nombre y apellido obligatorios; teléfono opcional (vacío = `NULL`). Búsqueda sin distinguir mayúsculas.
+- 2026-11-18 (E1-T5a): con una sola coincidencia se usa ese cliente aunque el teléfono dado sea distinto. Si se quiere que un teléfono distinto cree otro cliente, es un cambio de regla.
+- 2026-11-18 (E1-T5a): V2 deja `last_name = ''` en clientes existentes (no falla la migración); `ClientService` exige el apellido al crear o resolver un cliente.
+- 2026-11-18 (E1-T5a): un teléfono ya registrado a otro cliente se rechaza con `CLIENT_PHONE_TAKEN`, no con una excepción de la BD.
 - 2026-11-18 (E1-T5a): nombre y apellido obligatorios; teléfono opcional (vacío = `NULL`). Búsqueda sin distinguir mayúsculas.
 - 2026-11-18 (E1-T5a): con una sola coincidencia se usa ese cliente aunque el teléfono dado sea distinto. Si se quiere que un teléfono distinto cree otro cliente, es un cambio de regla.
 - 2026-11-18 (E1-T5a): V2 deja `last_name = ''` en clientes existentes (no falla la migración); `ClientService` exige el apellido al crear o resolver un cliente.
@@ -38,6 +46,8 @@ Siguiente: E1-T5b (`AppointmentService`: crear, cancelar, reprogramar, estados, 
 - Clientes que pagan a fin de mes (cepillados semanales): posible cuentas por cobrar — fuera de alcance por ahora.
 
 ## Bitácora (más reciente arriba)
+- 2026-11-18 — E1-T5b: `AppointmentService` (crear, reprogramar, cancelar, marcar atendida/no asistió) + `AvailabilityService.isAvailable` + transiciones en `AppointmentStatus`. 16 unitarias de servicio + 6 de disponibilidad + 6 de integración con PostgreSQL; suite completa 77 verdes. Sin commit (pendiente de OK).
+- 2026-11-18 — E1-T5a commit `7ac2515` publicado.
 - 2026-11-18 — E1-T5a: cliente con nombre y apellido, teléfono opcional (V2), `ClientService.resolveClient` + `BusinessRuleException`. 10 unitarias de servicio + 2 de repositorio; suite completa 49 verdes. Sin commit (pendiente de OK).
 - 2026-11-18 — E1-T4 commit `837256c` publicado (con el skill `reglas-de-agenda` alineado).
 - 2026-11-18 — Organización: se borró `database/` de la raíz (solo tenía README). Las migraciones quedan en `backend/src/main/resources/db/migration/`; el README pasó a `backend/README.md`.
