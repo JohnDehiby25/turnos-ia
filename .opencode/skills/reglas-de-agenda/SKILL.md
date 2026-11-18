@@ -20,7 +20,7 @@ Al crear o modificar lógica de citas, disponibilidad, horario o estados.
 - Zona horaria `America/Bogota`; guardar UTC.
 
 ## Disponibilidad (algoritmo)
-1. Tomar horario del día (override o base). 2. Restar citas `SCHEDULED`. 3. Devolver huecos ≥ duración del servicio,
+1. Tomar horario del día (override o base) y restar el almuerzo. 2. Restar citas no `CANCELLED` (las mismas que bloquea la restricción de BD). 3. Devolver huecos ≥ duración del servicio,
 en pasos de 15 min. 4. Para rangos, repetir por día.
 
 ## Tests mínimos

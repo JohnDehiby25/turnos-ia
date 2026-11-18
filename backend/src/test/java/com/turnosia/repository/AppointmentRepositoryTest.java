@@ -9,6 +9,7 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.turnosia.TestDataFactory;
 import com.turnosia.TestcontainersConfiguration;
@@ -32,6 +33,9 @@ class AppointmentRepositoryTest {
 
 	@Autowired
 	private ServiceTypeRepository serviceTypeRepository;
+
+	@Autowired
+	private JdbcTemplate jdbc;
 
 	@Test
 	void findAllByStartAtBetween_returnsAppointmentsOrderedByStartAt() {
@@ -80,5 +84,41 @@ class AppointmentRepositoryTest {
 				OffsetDateTime.parse("2026-11-18T12:00:00Z"), OffsetDateTime.parse("2026-11-18T13:00:00Z")));
 
 		assertThat(appointmentRepository.count()).isEqualTo(2);
+	}
+
+	@Test
+	void findNotCancelledOverlapping_returnsActiveAppointmentsThatOverlapRange() {
+		Client client = clientRepository.save(TestDataFactory.client("Ana", "3001234567"));
+		ServiceType mechas = serviceTypeRepository.save(TestDataFactory.serviceType("Mechas", 180));
+
+		appointmentRepository.saveAndFlush(TestDataFactory.appointment(client, mechas,
+				OffsetDateTime.parse("2026-11-18T09:00:00Z"), OffsetDateTime.parse("2026-11-18T10:00:00Z")));
+		appointmentRepository.saveAndFlush(TestDataFactory.appointment(client, mechas,
+				OffsetDateTime.parse("2026-11-18T12:00:00Z"), OffsetDateTime.parse("2026-11-18T13:00:00Z")));
+		Appointment cancelled = appointmentRepository.saveAndFlush(TestDataFactory.appointment(client, mechas,
+				OffsetDateTime.parse("2026-11-18T14:00:00Z"), OffsetDateTime.parse("2026-11-18T15:00:00Z")));
+		jdbc.update("UPDATE appointment SET status = 'CANCELLED' WHERE id = ?", cancelled.getId());
+
+		List<Appointment> result = appointmentRepository.findNotCancelledOverlapping(
+				OffsetDateTime.parse("2026-11-18T09:30:00Z").toInstant(),
+				OffsetDateTime.parse("2026-11-18T14:30:00Z").toInstant());
+
+		assertThat(result).extracting(a -> a.getStartAt().toString())
+				.containsExactly("2026-11-18T09:00:00Z", "2026-11-18T12:00:00Z");
+	}
+
+	@Test
+	void findNotCancelledOverlapping_appointmentEndingAtRangeStart_isExcluded() {
+		Client client = clientRepository.save(TestDataFactory.client("Ana", "3001234567"));
+		ServiceType mechas = serviceTypeRepository.save(TestDataFactory.serviceType("Mechas", 180));
+
+		appointmentRepository.saveAndFlush(TestDataFactory.appointment(client, mechas,
+				OffsetDateTime.parse("2026-11-18T08:00:00Z"), OffsetDateTime.parse("2026-11-18T09:00:00Z")));
+
+		List<Appointment> result = appointmentRepository.findNotCancelledOverlapping(
+				OffsetDateTime.parse("2026-11-18T09:00:00Z").toInstant(),
+				OffsetDateTime.parse("2026-11-18T10:00:00Z").toInstant());
+
+		assertThat(result).isEmpty();
 	}
 }

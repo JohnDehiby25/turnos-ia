@@ -23,7 +23,7 @@ Estimación en "sesiones" (1 sesión ≈ 2 h). Ritmo: 4–5 h por semana (≈ 2 
 - [x] E1-T1 Proyecto Spring Boot + PostgreSQL local (docker) + Flyway V1 (esquema + servicios iniciales: Mechas, Cepillado, Detalle). Usar el `docker-compose.yml` incluido
 - [x] E1-T2 Entidades + repositorios + test de repositorio (Testcontainers)
 - [x] E1-T3 `ScheduleService` (horario semanal, overrides, domingos cerrados) + tests
-- [ ] E1-T4 `AvailabilityService` (huecos por rango y duración) + tests
+- [x] E1-T4 `AvailabilityService` (huecos por rango y duración) + tests
 - [ ] E1-T5 `AppointmentService` (crear, cancelar, reprogramar, estados, sin solapamientos) + tests
 - [ ] E1-T6 Controladores REST + DTOs + manejo global de errores + tests MockMvc
 - [ ] E1-T7 Seguridad: login de la dueña (BCrypt + JWT o sesión), CORS, validaciones
