@@ -51,10 +51,24 @@ classDiagram
     classDef service fill:#90EE90,stroke:#333,stroke-width:2px,color:darkgreen
     classDef repository fill:#FFE4B5,stroke:#333,stroke-width:2px,color:darkorange
     classDef domain fill:#E6E6FA,stroke:#333,stroke-width:2px,color:darkblue
-    class AppointmentController,ScheduleController,ServicesController controller
-    class AppointmentService,AvailabilityService,ScheduleService,ServiceCatalogService service
-    class AppointmentRepository,ClientRepository,ServiceTypeRepository,WorkingHoursRepository,DayOverrideRepository repository
-    class Appointment,Client,ServiceType,WorkingHours,DayOverride,AppointmentStatus domain
+    class AppointmentController controller
+    class ScheduleController controller
+    class ServicesController controller
+    class AppointmentService service
+    class AvailabilityService service
+    class ScheduleService service
+    class ServiceCatalogService service
+    class AppointmentRepository repository
+    class ClientRepository repository
+    class ServiceTypeRepository repository
+    class WorkingHoursRepository repository
+    class DayOverrideRepository repository
+    class Appointment domain
+    class Client domain
+    class ServiceType domain
+    class WorkingHours domain
+    class DayOverride domain
+    class AppointmentStatus domain
 ```
 
 ## Reglas de capas (de `AGENTS.md` y skill `capas-spring-boot`)

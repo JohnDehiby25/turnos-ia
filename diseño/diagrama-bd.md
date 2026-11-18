@@ -35,7 +35,8 @@ erDiagram
     }
 
     WORKING_HOURS {
-        smallint weekday PK "1=Lun..7=Dom"
+        bigserial id PK
+        smallint weekday UK "1=Lun..7=Dom"
         boolean is_open
         time open_time
         time close_time

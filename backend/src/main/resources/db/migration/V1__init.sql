@@ -41,7 +41,8 @@ ALTER TABLE appointment
     EXCLUDE USING gist (tstzrange(start_at, end_at) WITH &&) WHERE (status <> 'CANCELLED');
 
 CREATE TABLE working_hours (
-    weekday     SMALLINT PRIMARY KEY CHECK (weekday BETWEEN 1 AND 7), -- 1=Lunes..7=Domingo (java.time.DayOfWeek)
+    id          BIGSERIAL PRIMARY KEY,
+    weekday     SMALLINT NOT NULL UNIQUE CHECK (weekday BETWEEN 1 AND 7), -- 1=Lunes..7=Domingo (java.time.DayOfWeek)
     is_open     BOOLEAN NOT NULL,
     open_time   TIME,
     close_time  TIME,
