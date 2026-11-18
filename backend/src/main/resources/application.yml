@@ -2,10 +2,10 @@ spring:
   application:
     name: turnosia
   datasource:
-    # Valores por defecto para desarrollo local; en producción se inyectan por variables de entorno.
+    # URL y usuario tienen valor por defecto para desarrollo local; DB_PASSWORD es obligatoria (sin valor por defecto).
     url: ${DB_URL:jdbc:postgresql://localhost:5432/turnosia}
     username: ${DB_USER:turnosia}
-    password: ${DB_PASSWORD:turnosia}
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: validate
