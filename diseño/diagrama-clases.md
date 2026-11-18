@@ -10,6 +10,7 @@ classDiagram
     class AppointmentService
     class AvailabilityService
     class ScheduleService
+    class DaySchedule
     class ServiceCatalogService
     class AppointmentRepository
     class ClientRepository
@@ -39,6 +40,7 @@ classDiagram
     AvailabilityService --> AppointmentRepository
     ScheduleService --> WorkingHoursRepository
     ScheduleService --> DayOverrideRepository
+    ScheduleService --> DaySchedule : devuelve
     ServiceCatalogService --> ServiceTypeRepository
     AppointmentRepository --> Appointment
     ClientRepository --> Client
@@ -57,6 +59,7 @@ classDiagram
     class AppointmentService service
     class AvailabilityService service
     class ScheduleService service
+    class DaySchedule service
     class ServiceCatalogService service
     class AppointmentRepository repository
     class ClientRepository repository

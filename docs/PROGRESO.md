@@ -2,17 +2,20 @@
 
 ## Estado actual
 - Etapa: E1 — Backend núcleo (sin IA)
-- Última tarea terminada: E1-T2
-- Tarea en curso: (ninguna)
-- Próxima tarea: E1-T3
+- Última tarea terminada: E1-T2 (commit hecho)
+- Tarea en curso: E1-T3 terminada en código y pruebas; pendiente de OK del usuario para commit
+- Próxima tarea: E1-T4 (pendiente de confirmar)
 
 ## Punto de control
-E1-T2 lista: 5 entidades JPA + 5 repositorios Spring Data + tests de repositorio con Testcontainers
-(18 tests en verde). Las anotaciones de test de Spring Boot 4 viven en paquetes nuevos
-(`org.springframework.boot.data.jpa.test.autoconfigure`, `org.springframework.boot.jdbc.test.autoconfigure`).
-Siguiente: E1-T3 (ScheduleService: horario semanal, overrides, domingos cerrados).
+E1-T3 lista en código: `ScheduleService` + `DaySchedule` + 7 tests unitarios en verde
+(`ScheduleServiceTest`, sin Docker). Falta: OK para commit + push.
+Siguiente: E1-T4 (`AvailabilityService`: huecos por rango y duración).
 
 ## Decisiones tomadas
+- 2026-11-18 (E1-T3): `ScheduleService` solo lee el horario de una fecha (sin escribir overrides). Escribir overrides llega con los endpoints (E1-T6) y la pantalla de ajustes (E2-T6).
+- 2026-11-18 (E1-T3): un `day_override` reemplaza por completo el horario semanal del día (si no trae almuerzo, ese día no tiene almuerzo). No se mezclan campos.
+- 2026-11-18 (E1-T3): domingo sin override = cerrado aunque `working_hours` diga abierto (RF6). Día de semana sin fila en `working_hours` = cerrado.
+- 2026-11-18 (E1-T3): sin `Clock` en `ScheduleService`: consulta por `LocalDate`, no depende de la hora actual.
 - 2026-11-18 (E1-T1): Spring Boot 4.1.2 en vez de 3.x (la línea 3 quedó EOL en 2026). El resto del stack no cambia.
 - 2026-11-18 (E0-T3): ritmo de trabajo 4–5 h por semana (≈ 2 sesiones); fechas objetivo en `ROADMAP.md`.
 - 2026-11-18 (E0-T2): una sola agenda (solo la dueña), almuerzo opcional por día, duración/precio por caso, cancelación sin ventana mínima, cobro al terminar, propinas opcionales (`tip`).
@@ -26,6 +29,7 @@ Siguiente: E1-T3 (ScheduleService: horario semanal, overrides, domingos cerrados
 - Clientes que pagan a fin de mes (cepillados semanales): posible cuentas por cobrar — fuera de alcance por ahora.
 
 ## Bitácora (más reciente arriba)
+- 2026-11-18 — E1-T3: `ScheduleService` + `DaySchedule` (horario efectivo por fecha: override > semanal, domingos cerrados) + 7 tests unitarios verdes. Diagrama de clases actualizado con `DaySchedule`. Sin commit (pendiente de OK).
 - 2026-11-18 — E1-T2: entidades JPA (5) + repositorios (5) + tests con Testcontainers; 18 tests verdes. Ajuste en V1: `working_hours` ahora tiene `id` BIGSERIAL (Hibernate no permite @Convert en @Id).
 - 2026-11-18 — E1-T1: esqueleto Spring Boot 4.1 (Java 21) + Flyway V1 (esquema + seed Mechas/Cepillado/Detalle) + docker-compose OK + 4 tests verdes (Testcontainers).
 - 2026-11-18 — Cierre de sesión: E0 aprobada; plan E1-T1 presentado (pendiente de OK para arrancar).
