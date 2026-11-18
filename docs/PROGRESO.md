@@ -2,14 +2,15 @@
 
 ## Estado actual
 - Etapa: E1 — Backend núcleo (sin IA)
-- Última tarea terminada: E1-T1
+- Última tarea terminada: E1-T2
 - Tarea en curso: (ninguna)
-- Próxima tarea: E1-T2
+- Próxima tarea: E1-T3
 
 ## Punto de control
-E1-T1 lista: diagramas en `diseño/`, esqueleto Spring Boot 4.1 (Java 21) en `backend/`, Flyway V1
-(esquema + seed Mechas/Cepillado/Detalle), PostgreSQL local con docker-compose y 4 tests en verde.
-Siguiente: E1-T2 (entidades + repositorios + tests de repositorio con Testcontainers).
+E1-T2 lista: 5 entidades JPA + 5 repositorios Spring Data + tests de repositorio con Testcontainers
+(18 tests en verde). Las anotaciones de test de Spring Boot 4 viven en paquetes nuevos
+(`org.springframework.boot.data.jpa.test.autoconfigure`, `org.springframework.boot.jdbc.test.autoconfigure`).
+Siguiente: E1-T3 (ScheduleService: horario semanal, overrides, domingos cerrados).
 
 ## Decisiones tomadas
 - 2026-11-18 (E1-T1): Spring Boot 4.1.2 en vez de 3.x (la línea 3 quedó EOL en 2026). El resto del stack no cambia.
@@ -25,6 +26,7 @@ Siguiente: E1-T2 (entidades + repositorios + tests de repositorio con Testcontai
 - Clientes que pagan a fin de mes (cepillados semanales): posible cuentas por cobrar — fuera de alcance por ahora.
 
 ## Bitácora (más reciente arriba)
+- 2026-11-18 — E1-T2: entidades JPA (5) + repositorios (5) + tests con Testcontainers; 18 tests verdes. Ajuste en V1: `working_hours` ahora tiene `id` BIGSERIAL (Hibernate no permite @Convert en @Id).
 - 2026-11-18 — E1-T1: esqueleto Spring Boot 4.1 (Java 21) + Flyway V1 (esquema + seed Mechas/Cepillado/Detalle) + docker-compose OK + 4 tests verdes (Testcontainers).
 - 2026-11-18 — Cierre de sesión: E0 aprobada; plan E1-T1 presentado (pendiente de OK para arrancar).
 - 2026-11-18 — E0-T3: fechas objetivo del roadmap llenadas (4–5 h/semana). Etapa E0 completa.
