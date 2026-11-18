@@ -14,8 +14,8 @@ Estimación en "sesiones" (1 sesión ≈ 2 h). Las fechas se llenan en E0-T3 seg
 | E6 | Mobile | 4–6 | ____ |
 
 ## E0 — Preparación
-- [ ] E0-T1 Repo GitHub, estructura, `.gitignore`, `.env.example`, ramas (`main` + `feature/*`)
-- [ ] E0-T2 Resolver preguntas abiertas de `REQUISITOS.md` con la dueña
+- [x] E0-T1 Repo GitHub, estructura, `.gitignore`, `.env.example`, ramas (`main` + `feature/*`)
+- [x] E0-T2 Resolver preguntas abiertas de `REQUISITOS.md` con la dueña
 - [ ] E0-T3 Definir mis horas por semana y llenar fechas objetivo de esta tabla
 **Puerta:** repo limpio en GitHub + preguntas abiertas respondidas.
 

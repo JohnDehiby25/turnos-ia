@@ -21,11 +21,12 @@ Regla: `controller` y `ai.tools` llaman a `service`; solo `service` llama a `rep
 
 ## Modelo de datos (PostgreSQL)
 - `client(id, name, phone UNIQUE, created_at)`
-- `service_type(id, name, duration_min, price NUMERIC(12,2) NULL, active)` — `price` NULL = "precio por confirmar"
-- `appointment(id, client_id, service_type_id, start_at, end_at, status, price_charged NUMERIC(12,2), notes, created_at, updated_at)`
-  - `created_at` = momento en que se asignó la cita. Índice por `start_at`. Restricción anti-solapamiento.
-- `working_hours(weekday, is_open, open_time, close_time)` — horario base semanal
-- `day_override(date, is_open, open_time NULL, close_time NULL, note)` — excepciones (ej. domingos que sí se trabajan)
+- `service_type(id, name, duration_min, price NUMERIC(12,2) NULL, active)` — `price` NULL = "precio por confirmar"; `duration_min` y `price` son estimados: la cita define los valores reales
+- `appointment(id, client_id, service_type_id, start_at, end_at, status, price_charged NUMERIC(12,2), tip NUMERIC(12,2) NULL, notes, created_at, updated_at)`
+  - `start_at`/`end_at` = duración real de la cita (por caso, según largo/estado del cabello). `tip` = propina opcional.
+  - `created_at` = momento en que se asignó la cita. Índice por `start_at`. Restricción anti-solapamiento (una sola persona atiende: no hay citas paralelas).
+- `working_hours(weekday, is_open, open_time, close_time, lunch_start NULL, lunch_end NULL)` — horario base semanal; almuerzo opcional por día (días muy agendados: sin almuerzo)
+- `day_override(date, is_open, open_time NULL, close_time NULL, lunch_start NULL, lunch_end NULL, note)` — excepciones (ej. domingos que sí se trabajan, días sin almuerzo); `lunch NULL` = sin almuerzo ese día
 - `knowledge_chunk(id, source, content, embedding vector(N), created_at)` — SOLO para búsqueda semántica
 
 ## ¿Para qué sirve la base vectorial aquí?
@@ -72,6 +73,6 @@ La API no cambia en ninguno de los dos casos; por eso la web y el backend se con
 - Las estadísticas son consultas agregadas en SQL (`GROUP BY` sobre `start_at AT TIME ZONE 'America/Bogota'`), no cálculos en Java ni en la IA.
 - Semana = lunes a domingo. Una cita cuenta en el día/semana/mes de su `start_at` en hora de Bogotá.
 - Dinero con `BigDecimal` y `NUMERIC` en BD; formateo `$ 120.000` solo en la presentación.
-- Respuesta de `/api/stats/summary`: por periodo → `appointmentsByStatus`, `incomeEarned`, `incomeProjected`, `incomeLost`, `topServices`.
+- Respuesta de `/api/stats/summary`: por periodo → `appointmentsByStatus`, `incomeEarned`, `incomeProjected`, `incomeLost`, `topServices`, `tipsTotal` (suma de `tip` de citas `ATTENDED`, aparte del dinero de servicios).
 - La IA no tiene lógica de estadísticas: la tool `get_income_summary` llama a `StatsService`.
 - No se usa la BD vectorial para nada de esto.

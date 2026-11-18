@@ -20,7 +20,7 @@ Mechas, Cepillado, Detalle (más los que se agreguen). Cada servicio tiene durac
   nombre del cliente, hora programada, tipo de cita, estado, y fecha y hora en que se asignó la cita (`created_at`).
 - RF2. Consultar espacios disponibles en un rango de fechas (opcionalmente según el servicio y su duración).
 - RF3. Crear cita (cliente, servicio, fecha/hora) validando que no choque con otra ni caiga fuera del horario.
-- RF4. Cancelar, reprogramar y marcar como atendida / no asistió.
+- RF4. Cancelar (sin ventana mínima de anticipación), reprogramar y marcar como atendida / no asistió.
 - RF5. Horario semanal configurable y excepciones por día (abrir o cerrar una fecha puntual).
 - RF6. **Domingo**: el sistema pregunta a la dueña (por WhatsApp/panel) si trabajará ese domingo antes de ofrecerlo
   a clientes; por defecto los domingos están CERRADOS hasta que ella confirme.
@@ -39,7 +39,8 @@ Mechas, Cepillado, Detalle (más los que se agreguen). Cada servicio tiene durac
   - **dinero ganado** = suma de `price_charged` de citas `ATTENDED`,
   - **dinero proyectado** = suma de citas `SCHEDULED`,
   - dinero no percibido = suma de `CANCELLED` + `NO_SHOW` (solo informativo),
-  - servicios más pedidos.
+  - servicios más pedidos,
+  - propinas del periodo (suma de `tip` de citas `ATTENDED`, aparte del dinero de servicios).
 - RF14. El bot responde en lenguaje natural ("¿cuánto cuesta un cepillado?", "¿cuánto gané esta semana?") llamando
   herramientas. El dinero siempre lo calcula el backend; la IA solo lo presenta.
 - Montos en pesos colombianos (COP), mostrados como `$ 120.000`. Días, semanas y meses según `America/Bogota`.
@@ -53,20 +54,22 @@ Mechas, Cepillado, Detalle (más los que se agreguen). Cada servicio tiene durac
 - Mantenibilidad: capas claras, tests de reglas de negocio, migraciones Flyway.
 
 ## Fuera de alcance (por ahora)
-Pagos en línea, contabilidad completa (gastos, impuestos, nómina), múltiples sucursales, múltiples estilistas con agendas separadas, app nativa iOS/Android
+Pagos en línea, contabilidad completa (gastos, impuestos, nómina), múltiples sucursales, múltiples estilistas con agendas separadas (incluida la manicurista), clientes que pagan a fin de mes (cuentas por cobrar), app nativa iOS/Android
 (se usa PWA instalable).
 
-## Preguntas abiertas (resolver con la dueña)
-- ¿Horario por defecto? ¿Hay hora de almuerzo?
-  El horario depende de la disponibilidad, regularmente hay hora de almuerzo, sin embargo en dias muy agendados no es posible como sabados o temporadas altas como diciembre o marzo
-- ¿Una sola persona atiende o varias a la vez?
-  Solo una persona atiende, la idea es basarlo solo en la dueña del negocio, aunque hay una manicurista,pero eso es tema aparte
-- ¿Duración real de mechas / cepillado / detalle?
-  Los servicios depende del largor, estado del cabello, y asesoramiento 
-  previamente para determinar un precio y tiempo estimado
-- ¿Con cuánta anticipación se puede cancelar?
-  La anticipacion es decision del cliente, aunque generalmente son casos extraños esos
-- ¿Cuáles son los precios actuales? ¿Son fijos o varían (ej. mechas según el largo del cabello)? ¿Se cobra al terminar?
-  Se cobra al terminar, sin embargo hay uno que otro cliente que paga es a fin de mes todos los cepillados de las semanas, son casos extraordinarios
-- ¿Hay descuentos o propinas que deban registrarse?
-  Los descuentos normalmente no los hay, mas que nada se genera el precio del servicio por varios factores, como situacion economica del cliente pero mayoritariamente es por el estado del cabello y caracteristicas asi, propinas se registran no son obligatorias, hay casos q los clientes dan propina por decision propia
+## Decisiones de la dueña (E0-T2, 2026-11-18)
+- **Horario**: no hay horario fijo; depende de la disponibilidad. Suele haber hora de almuerzo,
+  pero en días muy agendados (sábados, temporadas altas como diciembre o marzo) se omite.
+  → Horario semanal configurable con almuerzo opcional por día, ajustable por fecha.
+- **Atención**: solo atiende UNA persona (la dueña). La manicurista es tema aparte (fuera de alcance).
+  → Una sola agenda, sin citas paralelas.
+- **Duración y precio de los servicios**: dependen del largo y estado del cabello y de una
+  asesoría previa. → Cada cita define su duración (start/end) y su precio (`price_charged`) por caso;
+  el servicio solo da valores estimados por defecto.
+- **Cancelación**: sin ventana mínima; el cliente cancela cuando quiere (son casos extraños).
+  → No se impone regla de anticipación.
+- **Cobro**: se cobra al terminar el servicio. Algunos clientes pagan a fin de mes todos sus
+  cepillados de la semana (casos extraordinarios → fuera de alcance, anotado en Ideas).
+- **Descuentos**: no hay descuentos formales; el precio se define por caso (estado del cabello,
+  situación del cliente). → `price_charged` ajustable por cita, sin campo de descuento.
+- **Propinas**: se registran si el cliente las da (voluntarias). → `appointment.tip` opcional.
