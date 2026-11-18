@@ -17,7 +17,7 @@ simple: letra grande, pocos botones, máximo 3 acciones por pantalla.
   ni calcula dinero (siempre consulta el backend). Búsqueda semántica con `pgvector`.
 
 ## Stack
-- **Backend**: Java 21, Spring Boot 3, Maven, Spring Web / Data JPA / Security / AI, Flyway.
+- **Backend**: Java 21, Spring Boot 4, Maven, Spring Web / Data JPA / Security / AI, Flyway.
 - **Base de datos**: PostgreSQL 16 + `pgvector` (SQL y vectores en una sola BD).
 - **Frontend**: React + TypeScript + Vite + Tailwind CSS (mobile-first, PWA).
 - **Infra**: Docker + docker-compose, CI en GitHub Actions, deploy en Railway.
@@ -27,7 +27,7 @@ En desarrollo por etapas. Ver `docs/ROADMAP.md` (plan) y `docs/PROGRESO.md` (ava
 
 ## Estructura
 ```
-backend/    frontend/    database/    docs/    .opencode/
+backend/    frontend/    database/    diseño/    docs/    .opencode/
 ```
 
 ## Documentación

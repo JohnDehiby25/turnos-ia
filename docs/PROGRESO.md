@@ -2,17 +2,17 @@
 
 ## Estado actual
 - Etapa: E1 — Backend núcleo (sin IA)
-- Última tarea terminada: E0-T3 (puerta de E0 aprobada)
-- Tarea en curso: E1-T1 (plan presentado, pendiente de aprobación)
-- Próxima tarea: E1-T1
+- Última tarea terminada: E1-T1
+- Tarea en curso: (ninguna)
+- Próxima tarea: E1-T2
 
-## Punto de control (cierre de sesión 2026-11-18)
-Estoy en: E1-T1 con el plan ya presentado (diagramas en `diseño/` → esqueleto Spring Boot 3 → Flyway V1
-con seed de servicios → BD con docker-compose → test Testcontainers). Pendiente de aprobación del plan.
-Falta: aprobar el plan, iniciar Docker Desktop y ejecutar E1-T1.
-Siguiente paso: aprobar el plan y arrancar E1-T1 (rama `feature/E1-T1`).
+## Punto de control
+E1-T1 lista: diagramas en `diseño/`, esqueleto Spring Boot 4.1 (Java 21) en `backend/`, Flyway V1
+(esquema + seed Mechas/Cepillado/Detalle), PostgreSQL local con docker-compose y 4 tests en verde.
+Siguiente: E1-T2 (entidades + repositorios + tests de repositorio con Testcontainers).
 
 ## Decisiones tomadas
+- 2026-11-18 (E1-T1): Spring Boot 4.1.2 en vez de 3.x (la línea 3 quedó EOL en 2026). El resto del stack no cambia.
 - 2026-11-18 (E0-T3): ritmo de trabajo 4–5 h por semana (≈ 2 sesiones); fechas objetivo en `ROADMAP.md`.
 - 2026-11-18 (E0-T2): una sola agenda (solo la dueña), almuerzo opcional por día, duración/precio por caso, cancelación sin ventana mínima, cobro al terminar, propinas opcionales (`tip`).
 - 2026-11-17: PostgreSQL + pgvector en una sola BD
@@ -25,6 +25,7 @@ Siguiente paso: aprobar el plan y arrancar E1-T1 (rama `feature/E1-T1`).
 - Clientes que pagan a fin de mes (cepillados semanales): posible cuentas por cobrar — fuera de alcance por ahora.
 
 ## Bitácora (más reciente arriba)
+- 2026-11-18 — E1-T1: esqueleto Spring Boot 4.1 (Java 21) + Flyway V1 (esquema + seed Mechas/Cepillado/Detalle) + docker-compose OK + 4 tests verdes (Testcontainers).
 - 2026-11-18 — Cierre de sesión: E0 aprobada; plan E1-T1 presentado (pendiente de OK para arrancar).
 - 2026-11-18 — E0-T3: fechas objetivo del roadmap llenadas (4–5 h/semana). Etapa E0 completa.
 - 2026-11-18 — E0-T2: preguntas abiertas resueltas con la dueña → decisiones en `REQUISITOS.md`; modelo ajustado en `ARQUITECTURA.md` (almuerzo por día, `tip`, duración por caso, agenda única).

@@ -35,7 +35,7 @@ Luego actualiza `docs/PROGRESO.md` y haz commit + push a GitHub (regla fija, ver
 - Zona horaria SIEMPRE `America/Bogota`. Guardar fechas en UTC en BD, mostrar en hora local.
 
 ## Stack (no cambiar sin preguntarme)
-- Backend: Java 21, Spring Boot 3, Maven, Spring Web, Spring Data JPA, Validation, Spring Security, Flyway, Spring AI.
+- Backend: Java 21, Spring Boot 4, Maven, Spring Web, Spring Data JPA, Validation, Spring Security, Flyway, Spring AI.
 - Base de datos: PostgreSQL 16 + extensión pgvector (SQL y vectores en UNA sola BD).
 - Frontend web: React + TypeScript + Vite + Tailwind CSS (mobile-first, PWA).
 - IA: LLM con *tool calling* + embeddings (proveedor configurable por variables de entorno).
@@ -56,7 +56,7 @@ Detalle en `docs/ARQUITECTURA.md`.
 
 ## Estructura del repo
 ```
-backend/  frontend/  database/  docs/  .opencode/{skills,command}/  docker-compose.yml
+backend/  frontend/  database/  diseño/  docs/  .opencode/{skills,command}/  docker-compose.yml
 ```
 
 ## Documentos: cuándo leerlos
