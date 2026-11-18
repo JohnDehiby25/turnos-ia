@@ -39,6 +39,8 @@ public class ApiExceptionHandler {
 	private static HttpStatus statusFor(String code) {
 		return switch (code) {
 			case "APPOINTMENT_NOT_FOUND", "SERVICE_NOT_FOUND" -> HttpStatus.NOT_FOUND;
+			case "INVALID_CREDENTIALS" -> HttpStatus.UNAUTHORIZED;
+			case "TOO_MANY_ATTEMPTS" -> HttpStatus.TOO_MANY_REQUESTS;
 			case "APPOINTMENT_NOT_AVAILABLE", "APPOINTMENT_NOT_RESCHEDULABLE", "INVALID_STATUS_TRANSITION",
 					"CLIENT_AMBIGUOUS", "CLIENT_PHONE_TAKEN" -> HttpStatus.CONFLICT;
 			default -> HttpStatus.BAD_REQUEST;

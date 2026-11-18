@@ -4,16 +4,18 @@
 Mínimo privilegio · validar toda entrada · no confiar en el cliente ni en el LLM · secretos fuera del código · registrar sin exponer datos.
 
 ## E1 — Backend
-- [ ] Contraseña de la dueña con BCrypt; nunca en texto plano
-- [ ] Autenticación (JWT de corta duración o sesión) con Spring Security; todos los `/api/**` protegidos salvo login
-- [ ] Validación con `@Valid` en todos los DTOs; rechazar fechas pasadas, textos largos, IDs inexistentes
-- [ ] Sin SQL concatenado (solo JPA / parámetros)
-- [ ] CORS restringido al dominio del front
-- [ ] Usuario de BD con permisos mínimos (no superusuario) en producción
-- [ ] Errores sin stack traces ni detalles internos al cliente
-- [ ] Secretos solo por variables de entorno; `.env` en `.gitignore`
-- [ ] Rate limiting en login (anti fuerza bruta)
+- [x] Contraseña de la dueña con BCrypt; nunca en texto plano
+- [x] Autenticación (JWT de corta duración o sesión) con Spring Security; todos los `/api/**` protegidos salvo login
+- [x] Validación con `@Valid` en todos los DTOs; rechazar fechas pasadas, textos largos, IDs inexistentes
+- [x] Sin SQL concatenado (solo JPA / parámetros)
+- [x] CORS restringido al dominio del front (`ALLOWED_ORIGINS`)
+- [ ] Usuario de BD con permisos mínimos (no superusuario) en producción → pendiente de E4 (despliegue)
+- [x] Errores sin stack traces ni detalles internos al cliente
+- [x] Secretos solo por variables de entorno; `.env` en `.gitignore`
+- [x] Rate limiting en login (anti fuerza bruta) → 5 intentos en 15 min, bloqueo 15 min, por usuario y por IP
 - [ ] Edición de precios y `/api/stats/**` solo para rol ADMIN; consulta de precios es solo lectura
+      → el rol `ADMIN` ya existe (E1-T7); las rutas llegan en E1-T8 y E1-T9
+- [x] CSRF activo en la API con cookie `XSRF-TOKEN` (el front la envía en la cabecera `X-XSRF-TOKEN`)
 
 ## E2 — Frontend
 - [ ] Token no expuesto en logs; manejo de expiración

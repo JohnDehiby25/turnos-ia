@@ -2,18 +2,23 @@
 
 ## Estado actual
 - Etapa: E1 — Backend núcleo (sin IA)
-- Última tarea terminada: E1-T5b (commit `3ef8660`, publicado en GitHub)
-- Tarea en curso: E1-T6 (controladores REST, DTOs, manejo de errores, MockMvc) terminada en código y pruebas; pendiente de OK del usuario para commit
-- Próxima tarea: E1-T7 (seguridad: login de la dueña, CORS, validaciones) — pendiente de confirmar
+- Última tarea terminada: E1-T6 (commit `912e699`, publicado en GitHub)
+- Tarea en curso: E1-T7 (seguridad) terminada en código y pruebas; pendiente de OK del usuario para commit
+- Próxima tarea: E1-T8 (precios) — pendiente de confirmar
 
 ## Punto de control
-E1-T6 lista en código: `AppointmentController` (POST, GET por día o rango con estado, PUT reprogramar, PATCH estado),
-`AvailabilityController` (GET huecos por servicio), `ScheduleController` (GET/PUT horario de un día), DTOs `record`,
-`ApiExceptionHandler` (`{code, message}`; códigos de negocio → 404/409/400). Suite completa: 104 tests en verde (Docker encendido).
-Falta: OK para commit + push. Endpoints sin autenticación hasta E1-T7: la API se usa solo en local.
-Siguiente: E1-T7 (login de la dueña, CORS y validaciones de seguridad).
+E1-T7 lista en código: `SecurityConfig` (sesión con cookie, CSRF con cookie `XSRF-TOKEN`, CORS por `ALLOWED_ORIGINS`,
+401/403 en `{code, message}`), `AuthController` (login/logout/me/csrf), `AuthService`, `LoginRateLimiter` (5 intentos en
+15 min, bloqueo 15 min, por usuario y por IP), `AdminUserService` + `AdminUserInitializer` (sincroniza `ADMIN_USERNAME` /
+`ADMIN_PASSWORD` al arrancar), migración V3 `app_user`. Suite completa: 127 tests en verde (Docker encendido).
+Falta: OK para commit + push.
+Siguiente: E1-T8 (precios: `ServiceCatalogService`, `GET/PUT /api/services`, `price_charged` al crear cita).
 
 ## Decisiones tomadas
+- 2026-11-18 (E1-T7): sesión con cookie `httpOnly` en vez de JWT: un solo usuario, el front y la API bajo el mismo dominio y nada de tokens en el navegador. CSRF activo con cookie `XSRF-TOKEN`.
+- 2026-11-18 (E1-T7): la contraseña de la dueña se define con `ADMIN_PASSWORD` y se sincroniza al arrancar; si la variable está vacía, la cuenta existente conserva su hash. En la BD solo hay hash BCrypt.
+- 2026-11-18 (E1-T7): el límite de intentos cuenta por usuario y por IP, en memoria. Detrás de un proxy (Railway) todas las peticiones vienen de la misma IP, así que el bloqueo es por servidor.
+- 2026-11-18 (E1-T7): `GET /api/auth/csrf` expone el token para que el front pueda hacer su primer POST.
 - 2026-11-18 (E1-T6): las respuestas de la API devuelven fechas en UTC (`Instant`); las peticiones aceptan fecha con zona horaria (`OffsetDateTime`), así que una hora sin zona se rechaza. El frontend muestra en `America/Bogota`.
 - 2026-11-18 (E1-T6): `Appointment.client` y `serviceType` pasan a carga ansiosa porque `open-in-view` está apagado y los DTOs se construyen fuera de la transacción.
 - 2026-11-18 (E1-T6): `PUT /api/schedule/days/{date}` guarda el override del día (abrir un domingo o cerrar un día); validación de horas y almuerzo en `ScheduleService`.
@@ -52,6 +57,8 @@ Siguiente: E1-T7 (login de la dueña, CORS y validaciones de seguridad).
 - Clientes que pagan a fin de mes (cepillados semanales): posible cuentas por cobrar — fuera de alcance por ahora.
 
 ## Bitácora (más reciente arriba)
+- 2026-11-18 — E1-T7: sesión con cookie, BCrypt, CORS restringido, CSRF, rate limiting en login, migración V3 `app_user`. 7 de controlador, 5 de integración de seguridad, 8 de límite de intentos, 3 de sincronización de usuaria. Suite completa 127 verdes. Sin commit (pendiente de OK).
+- 2026-11-18 — E1-T6 commit `912e699` publicado.
 - 2026-11-18 — E1-T6: controladores de citas, disponibilidad y horario; DTOs `record`; `ApiExceptionHandler`. 18 tests de servicio de citas, 16 de controladores (MockMvc), 6 de horario, 2 de disponibilidad, 1 de repositorio. Suite completa 104 verdes. Sin commit (pendiente de OK).
 - 2026-11-18 — E1-T5b commit `3ef8660` publicado.
 - 2026-11-18 — Auditoría de seguridad de herramientas y descargas: dependencias Maven (136) sin vulnerabilidades conocidas en OSV (control positivo verificado); imagen pgvector con 1 CVE alto sin parche en Debian (pam, EPSS 0,5 %); wrapper de Maven sin verificación de hash → añadido `distributionSha256Sum` (Maven 3.10.1 ya es la última estable); imagen de BD fijada por digest en `docker-compose.yml` y pruebas; Temurin 21.0.8 → 21.0.13 descargado y verificado por SHA-256, pendiente de instalación manual. Suite completa: 77 verdes. Extensión `dof.sql-tools-extenions` desinstalada y reemplazada por `ms-ossdata.vscode-pgsql` v1.34.0 (Microsoft, verificado). Contraseña por defecto retirada de `application.yml`: sin `DB_PASSWORD` el arranque falla con "password authentication failed" (documentado en `backend/README.md`). Pendiente manual: instalar `OpenJDK21U-jdk_x64_windows_hotspot_21.0.13_9.msi` (SHA-256 verificado) desde `%TEMP%\jdk-check`. Sin commit (pendiente de OK).

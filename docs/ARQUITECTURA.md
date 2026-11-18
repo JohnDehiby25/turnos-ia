@@ -37,6 +37,9 @@ No: guardar citas ni calcular disponibilidad (eso es SQL exacto).
 ## API REST (v1)
 | Método | Ruta | Descripción |
 |---|---|---|
+| POST | `/api/auth/login` | Iniciar sesión (cookie de sesión) |
+| POST | `/api/auth/logout` | Cerrar sesión |
+| GET | `/api/auth/me` | Usuaria de la sesión actual |
 | GET | `/api/appointments?date=2026-11-18` | Turnos de un día |
 | GET | `/api/appointments?from=&to=&status=` | Turnos por rango/estado |
 | GET | `/api/availability?from=&to=&serviceId=` | Espacios libres |
@@ -52,6 +55,10 @@ No: guardar citas ni calcular disponibilidad (eso es SQL exacto).
 
 Respuestas de error uniformes: `{ "code": "...", "message": "..." }`.
 Fechas: las respuestas van en UTC; las peticiones deben incluir zona horaria (p. ej. `2026-11-19T09:00:00-05:00`).
+Autenticación: sesión con cookie `SESSION` (`httpOnly`). Todas las rutas `/api/**` exigen sesión salvo
+`POST /api/auth/login` y `GET /api/auth/csrf`. CSRF activo: el front toma la cookie `XSRF-TOKEN` y la reenvía
+en la cabecera `X-XSRF-TOKEN`. La usuaria se crea o actualiza al arrancar con `ADMIN_USERNAME` y `ADMIN_PASSWORD`
+(solo queda el hash BCrypt en la BD).
 
 ## Frontend
 `frontend/src`: `pages/` (Hoy, Agenda, Disponibilidad, Chat, Ajustes), `components/`, `api/` (cliente tipado),

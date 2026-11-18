@@ -7,6 +7,7 @@ classDiagram
     class AppointmentController
     class ScheduleController
     class AvailabilityController
+    class AuthController
     class ServicesController
     class AppointmentService
     class AvailabilityService
@@ -15,16 +16,21 @@ classDiagram
     class FreeSlot
     class ServiceCatalogService
     class ClientService
+    class AuthService
+    class AdminUserService
+    class LoginRateLimiter
     class AppointmentRepository
     class ClientRepository
     class ServiceTypeRepository
     class WorkingHoursRepository
     class DayOverrideRepository
+    class AppUserRepository
     class Appointment
     class Client
     class ServiceType
     class WorkingHours
     class DayOverride
+    class AppUser
     class AppointmentStatus {
         <<enumeration>>
         SCHEDULED
@@ -51,11 +57,15 @@ classDiagram
     ScheduleService --> DaySchedule : devuelve
     ServiceCatalogService --> ServiceTypeRepository
     ClientService --> ClientRepository
+    AuthController --> AuthService : login
+    AuthService --> LoginRateLimiter : anti fuerza bruta
+    AdminUserService --> AppUserRepository
     AppointmentRepository --> Appointment
     ClientRepository --> Client
     ServiceTypeRepository --> ServiceType
     WorkingHoursRepository --> WorkingHours
     DayOverrideRepository --> DayOverride
+    AppUserRepository --> AppUser
     Appointment --> AppointmentStatus
 
     classDef controller fill:#87CEEB,stroke:#333,stroke-width:2px,color:darkblue
@@ -64,6 +74,7 @@ classDiagram
     classDef domain fill:#E6E6FA,stroke:#333,stroke-width:2px,color:darkblue
     class AppointmentController controller
     class ScheduleController controller
+    class AuthController controller
     class AvailabilityController controller
     class ServicesController controller
     class AppointmentService service
@@ -72,17 +83,22 @@ classDiagram
     class DaySchedule service
     class FreeSlot service
     class ClientService service
+    class AuthService service
+    class AdminUserService service
+    class LoginRateLimiter service
     class ServiceCatalogService service
     class AppointmentRepository repository
     class ClientRepository repository
     class ServiceTypeRepository repository
     class WorkingHoursRepository repository
+    class AppUserRepository repository
     class DayOverrideRepository repository
     class Appointment domain
     class Client domain
     class ServiceType domain
     class WorkingHours domain
     class DayOverride domain
+    class AppUser domain
     class AppointmentStatus domain
 ```
 
