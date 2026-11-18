@@ -35,7 +35,7 @@ class SchemaMigrationTest {
 
 	@Test
 	void exclusionConstraint_overlappingAppointment_rejectsInsert() {
-		jdbc.update("INSERT INTO client (name, phone) VALUES ('Ana', '3000000001')");
+		jdbc.update("INSERT INTO client (first_name, last_name, phone) VALUES ('Ana', 'Gómez', '3000000001')");
 
 		jdbc.update(INSERT_APPOINTMENT, 1, 1,
 				OffsetDateTime.parse("2026-11-18T15:00:00Z"),
@@ -49,7 +49,7 @@ class SchemaMigrationTest {
 
 	@Test
 	void exclusionConstraint_adjacentAppointment_isAllowed() {
-		jdbc.update("INSERT INTO client (name, phone) VALUES ('Luis', '3000000002')");
+		jdbc.update("INSERT INTO client (first_name, last_name, phone) VALUES ('Luis', 'Pérez', '3000000002')");
 
 		jdbc.update(INSERT_APPOINTMENT, 1, 1,
 				OffsetDateTime.parse("2026-11-18T16:00:00Z"),

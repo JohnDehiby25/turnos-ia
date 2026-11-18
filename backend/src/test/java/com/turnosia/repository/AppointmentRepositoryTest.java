@@ -39,7 +39,7 @@ class AppointmentRepositoryTest {
 
 	@Test
 	void findAllByStartAtBetween_returnsAppointmentsOrderedByStartAt() {
-		Client client = clientRepository.save(TestDataFactory.client("Ana", "3001234567"));
+		Client client = clientRepository.save(TestDataFactory.client("Ana", "Gómez", "3001234567"));
 		ServiceType mechas = serviceTypeRepository.save(TestDataFactory.serviceType("Mechas", 180));
 
 		appointmentRepository.save(TestDataFactory.appointment(client, mechas,
@@ -59,7 +59,7 @@ class AppointmentRepositoryTest {
 
 	@Test
 	void save_overlappingAppointment_throwsDataIntegrityViolation() {
-		Client client = clientRepository.save(TestDataFactory.client("Ana", "3001234567"));
+		Client client = clientRepository.save(TestDataFactory.client("Ana", "Gómez", "3001234567"));
 		ServiceType mechas = serviceTypeRepository.save(TestDataFactory.serviceType("Mechas", 180));
 
 		appointmentRepository.saveAndFlush(TestDataFactory.appointment(client, mechas,
@@ -74,7 +74,7 @@ class AppointmentRepositoryTest {
 
 	@Test
 	void save_adjacentAppointment_isAllowed() {
-		Client client = clientRepository.save(TestDataFactory.client("Ana", "3001234567"));
+		Client client = clientRepository.save(TestDataFactory.client("Ana", "Gómez", "3001234567"));
 		ServiceType mechas = serviceTypeRepository.save(TestDataFactory.serviceType("Mechas", 180));
 
 		appointmentRepository.saveAndFlush(TestDataFactory.appointment(client, mechas,
@@ -88,7 +88,7 @@ class AppointmentRepositoryTest {
 
 	@Test
 	void findNotCancelledOverlapping_returnsActiveAppointmentsThatOverlapRange() {
-		Client client = clientRepository.save(TestDataFactory.client("Ana", "3001234567"));
+		Client client = clientRepository.save(TestDataFactory.client("Ana", "Gómez", "3001234567"));
 		ServiceType mechas = serviceTypeRepository.save(TestDataFactory.serviceType("Mechas", 180));
 
 		appointmentRepository.saveAndFlush(TestDataFactory.appointment(client, mechas,
@@ -109,7 +109,7 @@ class AppointmentRepositoryTest {
 
 	@Test
 	void findNotCancelledOverlapping_appointmentEndingAtRangeStart_isExcluded() {
-		Client client = clientRepository.save(TestDataFactory.client("Ana", "3001234567"));
+		Client client = clientRepository.save(TestDataFactory.client("Ana", "Gómez", "3001234567"));
 		ServiceType mechas = serviceTypeRepository.save(TestDataFactory.serviceType("Mechas", 180));
 
 		appointmentRepository.saveAndFlush(TestDataFactory.appointment(client, mechas,

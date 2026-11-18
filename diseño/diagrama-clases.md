@@ -13,6 +13,7 @@ classDiagram
     class DaySchedule
     class FreeSlot
     class ServiceCatalogService
+    class ClientService
     class AppointmentRepository
     class ClientRepository
     class ServiceTypeRepository
@@ -37,7 +38,7 @@ classDiagram
     AppointmentService --> AvailabilityService : consulta huecos
     AppointmentService --> ScheduleService : valida horario
     AppointmentService --> AppointmentRepository
-    AppointmentService --> ClientRepository
+    AppointmentService --> ClientService : resuelve cliente
     AvailabilityService --> AppointmentRepository
     AvailabilityService --> ScheduleService : horario del día
     AvailabilityService --> FreeSlot : devuelve
@@ -45,6 +46,7 @@ classDiagram
     ScheduleService --> DayOverrideRepository
     ScheduleService --> DaySchedule : devuelve
     ServiceCatalogService --> ServiceTypeRepository
+    ClientService --> ClientRepository
     AppointmentRepository --> Appointment
     ClientRepository --> Client
     ServiceTypeRepository --> ServiceType
@@ -64,6 +66,7 @@ classDiagram
     class ScheduleService service
     class DaySchedule service
     class FreeSlot service
+    class ClientService service
     class ServiceCatalogService service
     class AppointmentRepository repository
     class ClientRepository repository

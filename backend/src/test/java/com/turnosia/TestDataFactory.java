@@ -14,8 +14,8 @@ public final class TestDataFactory {
 	private TestDataFactory() {
 	}
 
-	public static Client client(String name, String phone) {
-		return new Client(name, phone);
+	public static Client client(String firstName, String lastName, String phone) {
+		return new Client(firstName, lastName, phone);
 	}
 
 	public static ServiceType serviceType(String name, int durationMin) {

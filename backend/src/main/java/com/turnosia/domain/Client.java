@@ -17,10 +17,14 @@ public class Client {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = false, length = 120)
-	private String name;
+	@Column(name = "first_name", nullable = false, length = 120)
+	private String firstName;
 
-	@Column(nullable = false, unique = true, length = 20)
+	@Column(name = "last_name", nullable = false, length = 120)
+	private String lastName;
+
+	/** Opcional: NULL = sin teléfono. Si existe, es único. */
+	@Column(unique = true, length = 20)
 	private String phone;
 
 	@Column(name = "created_at", nullable = false, updatable = false)
@@ -29,8 +33,9 @@ public class Client {
 	protected Client() {
 	}
 
-	public Client(String name, String phone) {
-		this.name = name;
+	public Client(String firstName, String lastName, String phone) {
+		this.firstName = firstName;
+		this.lastName = lastName;
 		this.phone = phone;
 		this.createdAt = Instant.now();
 	}
@@ -39,8 +44,12 @@ public class Client {
 		return id;
 	}
 
-	public String getName() {
-		return name;
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
 	}
 
 	public String getPhone() {

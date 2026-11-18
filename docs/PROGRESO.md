@@ -2,17 +2,21 @@
 
 ## Estado actual
 - Etapa: E1 — Backend núcleo (sin IA)
-- Última tarea terminada: E1-T3 (commit `e35ede3`, publicado en GitHub)
-- Tarea en curso: E1-T4 terminada en código y pruebas; pendiente de OK del usuario para commit
-- Próxima tarea: E1-T5 (pendiente de confirmar)
+- Última tarea terminada: E1-T4 (commit `837256c`, publicado en GitHub)
+- Tarea en curso: E1-T5a (cliente) terminada en código y pruebas; pendiente de OK del usuario para commit
+- Próxima tarea: E1-T5b (`AppointmentService`)
 
 ## Punto de control
-E1-T4 lista en código: `AvailabilityService` + `FreeSlot` + `ClockConfig` + consulta
-`findNotCancelledOverlapping` + 10 tests unitarios + 2 de repositorio. Suite completa: 37 tests en verde
-(Docker encendido). Falta: OK para commit + push.
-Siguiente: E1-T5 (`AppointmentService`: crear, cancelar, reprogramar, estados, sin solapamientos).
+E1-T5a lista en código: V2 (`client`: `first_name`, `last_name`, `phone` opcional), `Client`, `ClientService.resolveClient`
+(homónimos piden teléfono; teléfono ya usado por otro cliente = error de negocio), `BusinessRuleException`.
+Suite completa: 49 tests en verde (Docker encendido). Falta: OK para commit + push.
+Siguiente: E1-T5b (`AppointmentService`: crear, cancelar, reprogramar, estados, sin solapamientos; usa `ClientService`).
 
 ## Decisiones tomadas
+- 2026-11-18 (E1-T5a): nombre y apellido obligatorios; teléfono opcional (vacío = `NULL`). Búsqueda sin distinguir mayúsculas.
+- 2026-11-18 (E1-T5a): con una sola coincidencia se usa ese cliente aunque el teléfono dado sea distinto. Si se quiere que un teléfono distinto cree otro cliente, es un cambio de regla.
+- 2026-11-18 (E1-T5a): V2 deja `last_name = ''` en clientes existentes (no falla la migración); `ClientService` exige el apellido al crear o resolver un cliente.
+- 2026-11-18 (E1-T5a): un teléfono ya registrado a otro cliente se rechaza con `CLIENT_PHONE_TAKEN`, no con una excepción de la BD.
 - 2026-11-18 (E1-T4): la disponibilidad bloquea todas las citas no `CANCELLED`, igual que la restricción de BD. El skill `reglas-de-agenda` se alineó en el mismo commit.
 - 2026-11-18 (E1-T4): inicios cada 15 min desde la hora de apertura; un hueco debe caber completo antes del cierre y no empezar antes de "ahora".
 - 2026-11-18 (E1-T4): la duración llega en minutos. Resolver `serviceId` → duración queda para el controlador (E1-T6).
@@ -34,6 +38,8 @@ Siguiente: E1-T5 (`AppointmentService`: crear, cancelar, reprogramar, estados, s
 - Clientes que pagan a fin de mes (cepillados semanales): posible cuentas por cobrar — fuera de alcance por ahora.
 
 ## Bitácora (más reciente arriba)
+- 2026-11-18 — E1-T5a: cliente con nombre y apellido, teléfono opcional (V2), `ClientService.resolveClient` + `BusinessRuleException`. 10 unitarias de servicio + 2 de repositorio; suite completa 49 verdes. Sin commit (pendiente de OK).
+- 2026-11-18 — E1-T4 commit `837256c` publicado (con el skill `reglas-de-agenda` alineado).
 - 2026-11-18 — Organización: se borró `database/` de la raíz (solo tenía README). Las migraciones quedan en `backend/src/main/resources/db/migration/`; el README pasó a `backend/README.md`.
 - 2026-11-18 — E1-T4: `AvailabilityService` (huecos cada 15 min, citas no canceladas, almuerzo, pasado excluido) + `FreeSlot` + consulta `findNotCancelledOverlapping` + `ClockConfig`. 10 unitarias + 2 de repositorio; suite completa 37 verdes. Diagrama de clases actualizado. Sin commit (pendiente de OK).
 - 2026-11-18 — E1-T3: `ScheduleService` + `DaySchedule` (horario efectivo por fecha: override > semanal, domingos cerrados) + 7 tests unitarios verdes. Diagrama de clases actualizado con `DaySchedule`. Sin commit (pendiente de OK).

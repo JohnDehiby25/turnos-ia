@@ -20,7 +20,7 @@ config/        seguridad, CORS, Spring AI
 Regla: `controller` y `ai.tools` llaman a `service`; solo `service` llama a `repository`.
 
 ## Modelo de datos (PostgreSQL)
-- `client(id, name, phone UNIQUE, created_at)`
+- `client(id, first_name, last_name, phone UNIQUE NULL, created_at)` — nombre y apellido obligatorios; teléfono opcional. Se busca por nombre y apellido (sin distinguir mayúsculas); si hay homónimos, se pide el teléfono.
 - `service_type(id, name, duration_min, price NUMERIC(12,2) NULL, active)` — `price` NULL = "precio por confirmar"; `duration_min` y `price` son estimados: la cita define los valores reales
 - `appointment(id, client_id, service_type_id, start_at, end_at, status, price_charged NUMERIC(12,2), tip NUMERIC(12,2) NULL, notes, created_at, updated_at)`
   - `start_at`/`end_at` = duración real de la cita (por caso, según largo/estado del cabello). `tip` = propina opcional.

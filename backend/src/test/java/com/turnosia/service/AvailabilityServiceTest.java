@@ -168,7 +168,7 @@ class AvailabilityServiceTest {
 	}
 
 	private static Appointment busy(String start, String end) {
-		Client client = TestDataFactory.client("Ana", "3001234567");
+		Client client = TestDataFactory.client("Ana", "Gómez", "3001234567");
 		ServiceType mechas = TestDataFactory.serviceType("Mechas", 180);
 		return TestDataFactory.appointment(client, mechas, OffsetDateTime.parse(start), OffsetDateTime.parse(end));
 	}

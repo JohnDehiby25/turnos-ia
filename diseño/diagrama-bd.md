@@ -7,8 +7,9 @@ erDiagram
 
     CLIENT {
         bigserial id PK
-        varchar name
-        varchar phone "UNIQUE"
+        varchar first_name
+        varchar last_name
+        varchar phone "UNIQUE, opcional"
         timestamptz created_at
     }
 

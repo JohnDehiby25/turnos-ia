@@ -1,5 +1,7 @@
 package com.turnosia.repository;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
@@ -24,7 +26,7 @@ class ClientRepositoryTest {
 
 	@Test
 	void save_newClient_persistsWithIdAndTimestamp() {
-		Client saved = clientRepository.save(TestDataFactory.client("Ana", "3001234567"));
+		Client saved = clientRepository.save(TestDataFactory.client("Ana", "Gómez", "3001234567"));
 
 		assertThat(saved.getId()).isNotNull();
 		assertThat(saved.getCreatedAt()).isNotNull();
@@ -32,7 +34,7 @@ class ClientRepositoryTest {
 
 	@Test
 	void existsByPhone_existingAndUnknownPhone_returnsTrueAndFalse() {
-		clientRepository.save(TestDataFactory.client("Ana", "3001234567"));
+		clientRepository.save(TestDataFactory.client("Ana", "Gómez", "3001234567"));
 
 		assertThat(clientRepository.existsByPhone("3001234567")).isTrue();
 		assertThat(clientRepository.existsByPhone("3110000000")).isFalse();
@@ -40,17 +42,35 @@ class ClientRepositoryTest {
 
 	@Test
 	void findByPhone_unknownPhone_returnsEmpty() {
-		clientRepository.save(TestDataFactory.client("Ana", "3001234567"));
+		clientRepository.save(TestDataFactory.client("Ana", "Gómez", "3001234567"));
 
 		assertThat(clientRepository.findByPhone("3110000000")).isEmpty();
 	}
 
 	@Test
 	void save_duplicatePhone_throwsDataIntegrityViolation() {
-		clientRepository.saveAndFlush(TestDataFactory.client("Ana", "3001234567"));
+		clientRepository.saveAndFlush(TestDataFactory.client("Ana", "Gómez", "3001234567"));
 
 		assertThatThrownBy(() ->
-				clientRepository.saveAndFlush(TestDataFactory.client("Luis", "3001234567")))
+				clientRepository.saveAndFlush(TestDataFactory.client("Luis", "Pérez", "3001234567")))
 				.isInstanceOf(DataIntegrityViolationException.class);
+	}
+
+	@Test
+	void save_clientsWithoutPhone_areAllowed() {
+		clientRepository.saveAndFlush(TestDataFactory.client("Ana", "Gómez", null));
+		clientRepository.saveAndFlush(TestDataFactory.client("Luis", "Pérez", null));
+
+		assertThat(clientRepository.count()).isEqualTo(2);
+	}
+
+	@Test
+	void findAllByFirstNameIgnoreCaseAndLastNameIgnoreCase_matchesRegardlessOfCase() {
+		clientRepository.save(TestDataFactory.client("Ana", "Gomez", "3001234567"));
+		clientRepository.save(TestDataFactory.client("Ana", "Perez", null));
+
+		List<Client> result = clientRepository.findAllByFirstNameIgnoreCaseAndLastNameIgnoreCase("ANA", "gomez");
+
+		assertThat(result).extracting(Client::getPhone).containsExactly("3001234567");
 	}
 }
