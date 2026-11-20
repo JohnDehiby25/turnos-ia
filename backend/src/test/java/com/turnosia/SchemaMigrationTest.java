@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class SchemaMigrationTest {
 
 	private static final String INSERT_APPOINTMENT =
-			"INSERT INTO appointment (client_id, service_type_id, start_at, end_at) VALUES (?, ?, ?, ?)";
+			"INSERT INTO appointment (client_id, service_type_id, start_at, end_at, price_charged) VALUES (?, ?, ?, ?, 35000)";
 
 	@Autowired
 	private JdbcTemplate jdbc;

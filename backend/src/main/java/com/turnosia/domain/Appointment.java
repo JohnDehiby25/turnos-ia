@@ -41,8 +41,8 @@ public class Appointment {
 	@Column(nullable = false, length = 20)
 	private AppointmentStatus status = AppointmentStatus.SCHEDULED;
 
-	/** Precio real de la cita (por caso); NULL = por confirmar. */
-	@Column(name = "price_charged", precision = 12, scale = 2)
+	/** Precio real de la cita (por caso). Obligatorio. */
+	@Column(name = "price_charged", nullable = false, precision = 12, scale = 2)
 	private BigDecimal priceCharged;
 
 	/** Propina opcional. */
@@ -72,6 +72,14 @@ public class Appointment {
 	public void changeStatus(AppointmentStatus next, Instant now) {
 		this.status = next;
 		this.updatedAt = now;
+	}
+
+	public void chargePrice(BigDecimal price) {
+		this.priceCharged = price;
+	}
+
+	public void recordTip(BigDecimal amount) {
+		this.tip = amount;
 	}
 
 	public void reschedule(Instant newStartAt, Instant newEndAt, Instant now) {

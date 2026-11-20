@@ -13,8 +13,8 @@ Mínimo privilegio · validar toda entrada · no confiar en el cliente ni en el 
 - [x] Errores sin stack traces ni detalles internos al cliente
 - [x] Secretos solo por variables de entorno; `.env` en `.gitignore`
 - [x] Rate limiting en login (anti fuerza bruta) → 5 intentos en 15 min, bloqueo 15 min, por usuario y por IP
-- [ ] Edición de precios y `/api/stats/**` solo para rol ADMIN; consulta de precios es solo lectura
-      → el rol `ADMIN` ya existe (E1-T7); las rutas llegan en E1-T8 y E1-T9
+- [x] Edición de precios y `/api/stats/**` solo para rol ADMIN; consulta de precios es solo lectura
+      → `PUT /api/services/**` y `/api/stats/**` exigen ADMIN en `SecurityConfig` (E1-T8, E1-T9)
 - [x] CSRF activo en la API con cookie `XSRF-TOKEN` (el front la envía en la cabecera `X-XSRF-TOKEN`)
 
 ## E2 — Frontend

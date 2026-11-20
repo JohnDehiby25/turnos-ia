@@ -1,5 +1,6 @@
 package com.turnosia.dto;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 
 import com.turnosia.domain.Appointment;
@@ -15,6 +16,7 @@ public record AppointmentResponse(
 		Instant start,
 		Instant end,
 		AppointmentStatus status,
+		BigDecimal priceCharged,
 		Instant createdAt,
 		Instant updatedAt) {
 
@@ -29,6 +31,7 @@ public record AppointmentResponse(
 				appointment.getStartAt(),
 				appointment.getEndAt(),
 				appointment.getStatus(),
+				appointment.getPriceCharged(),
 				appointment.getCreatedAt(),
 				appointment.getUpdatedAt());
 	}

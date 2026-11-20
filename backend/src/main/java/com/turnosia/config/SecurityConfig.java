@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -90,6 +91,8 @@ public class SecurityConfig {
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
 				.authorizeHttpRequests(requests -> requests
 						.requestMatchers("/api/auth/login", "/api/auth/csrf").permitAll()
+						.requestMatchers(HttpMethod.PUT, "/api/services/**").hasRole("ADMIN")
+						.requestMatchers("/api/stats/**").hasRole("ADMIN")
 						.anyRequest().authenticated())
 				.exceptionHandling(handling -> handling
 						.authenticationEntryPoint((request, response, exception) ->

@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
@@ -42,12 +43,12 @@ class AppointmentControllerTest {
 
 	@Test
 	void create_validRequest_returns201WithAppointment() throws Exception {
-		when(appointmentService.create(eq("Ana"), eq("Gómez"), eq("3001234567"), eq(1L), eq(START), isNull()))
-				.thenReturn(appointment());
+		when(appointmentService.create(eq("Ana"), eq("Gómez"), eq("3001234567"), eq(1L), eq(START), isNull(),
+				eq(new BigDecimal("35000")))).thenReturn(appointment());
 
 		mockMvc.perform(post("/api/appointments").contentType(APPLICATION_JSON).content("""
 				{"firstName":"Ana","lastName":"Gómez","phone":"3001234567","serviceTypeId":1,
-				 "start":"2026-11-19T09:00:00-05:00"}
+				 "start":"2026-11-19T09:00:00-05:00","price":35000}
 				"""))
 				.andExpect(status().isCreated())
 				.andExpect(jsonPath("$.clientFirstName").value("Ana"))
@@ -65,12 +66,21 @@ class AppointmentControllerTest {
 	}
 
 	@Test
+	void create_withoutPrice_returns400Validation() throws Exception {
+		mockMvc.perform(post("/api/appointments").contentType(APPLICATION_JSON).content("""
+				{"firstName":"Ana","lastName":"Gómez","serviceTypeId":1,"start":"2026-11-19T09:00:00-05:00"}
+				"""))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.code").value("VALIDATION_ERROR"));
+	}
+
+	@Test
 	void create_slotNotAvailable_returns409WithCode() throws Exception {
-		when(appointmentService.create(any(), any(), any(), any(), any(), any()))
+		when(appointmentService.create(any(), any(), any(), any(), any(), any(), any()))
 				.thenThrow(new BusinessRuleException("APPOINTMENT_NOT_AVAILABLE", "Ese horario no está disponible"));
 
 		mockMvc.perform(post("/api/appointments").contentType(APPLICATION_JSON).content("""
-				{"firstName":"Ana","lastName":"Gómez","serviceTypeId":1,"start":"2026-11-19T09:00:00-05:00"}
+				{"firstName":"Ana","lastName":"Gómez","serviceTypeId":1,"start":"2026-11-19T09:00:00-05:00","price":35000}
 				"""))
 				.andExpect(status().isConflict())
 				.andExpect(jsonPath("$.code").value("APPOINTMENT_NOT_AVAILABLE"));

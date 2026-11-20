@@ -6,8 +6,8 @@ description: Reglas de precios de servicios y resúmenes de dinero por día, sem
 # Precios y estadísticas
 
 ## Reglas
-- `service_type.price` es el precio vigente; `appointment.price_charged` es el precio de ESA cita (copia al crearla, ajustable).
-  Editar el precio de un servicio nunca cambia citas anteriores.
+- `service_type.price` es solo referencia (NULL = por confirmar); `appointment.price_charged` es el precio de ESA cita,
+  obligatorio (NOT NULL, V4) y fijado por la dueña al crearla. Editar el precio de un servicio nunca cambia citas anteriores.
 - Dinero ganado = suma de `price_charged` con estado `ATTENDED`. Proyectado = `SCHEDULED`.
   No percibido = `CANCELLED` + `NO_SHOW` (informativo).
 - Todo cálculo en SQL agregado dentro de `StatsService`; `BigDecimal` en Java; `NUMERIC(12,2)` en BD.

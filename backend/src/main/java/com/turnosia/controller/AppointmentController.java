@@ -42,7 +42,8 @@ public class AppointmentController {
 	@ResponseStatus(HttpStatus.CREATED)
 	public AppointmentResponse create(@Valid @RequestBody CreateAppointmentRequest request) {
 		Appointment appointment = appointmentService.create(request.firstName(), request.lastName(),
-				request.phone(), request.serviceTypeId(), toInstant(request.start()), toInstant(request.end()));
+				request.phone(), request.serviceTypeId(), toInstant(request.start()), toInstant(request.end()),
+				request.price());
 		return AppointmentResponse.from(appointment);
 	}
 

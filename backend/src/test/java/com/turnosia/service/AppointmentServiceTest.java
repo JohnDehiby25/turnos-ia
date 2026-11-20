@@ -7,6 +7,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -58,7 +59,7 @@ class AppointmentServiceTest {
 		Clock clock = Clock.fixed(NOW, ZoneOffset.UTC);
 		appointmentService = new AppointmentService(clientService, serviceTypeRepository, appointmentRepository,
 				availabilityService, clock);
-		cepillado = new ServiceType("Cepillado", 45, null);
+		cepillado = new ServiceType("Cepillado", 45, new BigDecimal("35000.00"));
 		ana = new Client("Ana", "Gómez", null);
 	}
 
@@ -87,6 +88,57 @@ class AppointmentServiceTest {
 		Appointment appointment = appointmentService.create("Ana", "Gómez", null, SERVICE_ID, START, end);
 
 		assertThat(appointment.getEndAt()).isEqualTo(end);
+	}
+
+	@Test
+	void create_withoutPrice_copiesServicePrice() {
+		cepillado.changePrice(new BigDecimal("35000.00"));
+		givenService();
+		when(availabilityService.isAvailable(START, START.plus(Duration.ofMinutes(45)), null)).thenReturn(true);
+		when(clientService.resolveClient("Ana", "Gómez", null)).thenReturn(ana);
+		givenSaveReturnsArgument();
+
+		Appointment appointment = appointmentService.create("Ana", "Gómez", null, SERVICE_ID, START, null);
+
+		assertThat(appointment.getPriceCharged()).isEqualByComparingTo("35000.00");
+	}
+
+	@Test
+	void create_withCasePrice_usesGivenPriceInsteadOfServicePrice() {
+		cepillado.changePrice(new BigDecimal("35000.00"));
+		givenService();
+		when(availabilityService.isAvailable(START, START.plus(Duration.ofMinutes(45)), null)).thenReturn(true);
+		when(clientService.resolveClient("Ana", "Gómez", null)).thenReturn(ana);
+		givenSaveReturnsArgument();
+
+		Appointment appointment = appointmentService.create("Ana", "Gómez", null, SERVICE_ID, START, null,
+				new BigDecimal("20000.00"));
+
+		assertThat(appointment.getPriceCharged()).isEqualByComparingTo("20000.00");
+	}
+
+	@Test
+	void create_withoutAnyPrice_throwsPriceRequired() {
+		cepillado.changePrice(null);
+		givenService();
+
+		assertThatThrownBy(() -> appointmentService.create("Ana", "Gómez", null, SERVICE_ID, START, null))
+				.isInstanceOfSatisfying(BusinessRuleException.class,
+						e -> assertThat(e.getCode()).isEqualTo("APPOINTMENT_PRICE_REQUIRED"));
+	}
+
+	@Test
+	void create_afterServicePriceChanges_keepsPriceOfExistingAppointment() {
+		cepillado.changePrice(new BigDecimal("35000.00"));
+		givenService();
+		when(availabilityService.isAvailable(START, START.plus(Duration.ofMinutes(45)), null)).thenReturn(true);
+		when(clientService.resolveClient("Ana", "Gómez", null)).thenReturn(ana);
+		givenSaveReturnsArgument();
+		Appointment appointment = appointmentService.create("Ana", "Gómez", null, SERVICE_ID, START, null);
+
+		cepillado.changePrice(new BigDecimal("50000.00"));
+
+		assertThat(appointment.getPriceCharged()).isEqualByComparingTo("35000.00");
 	}
 
 	@Test

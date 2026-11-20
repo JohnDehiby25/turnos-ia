@@ -1,5 +1,6 @@
 package com.turnosia.service;
 
+import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -38,13 +39,26 @@ public class AppointmentService {
 	@Transactional
 	public Appointment create(String firstName, String lastName, String phone, Long serviceTypeId,
 			Instant start, Instant end) {
+		return create(firstName, lastName, phone, serviceTypeId, start, end, null);
+	}
+
+	/** El precio es de la cita: si no viene, se usa el precio vigente del servicio. Toda cita debe tener precio. */
+	@Transactional
+	public Appointment create(String firstName, String lastName, String phone, Long serviceTypeId,
+			Instant start, Instant end, BigDecimal price) {
 		requireFuture(start);
 		ServiceType service = activeService(serviceTypeId);
+		BigDecimal chargedPrice = price != null ? price : service.getPrice();
+		if (chargedPrice == null) {
+			throw new BusinessRuleException("APPOINTMENT_PRICE_REQUIRED", "La cita necesita un precio");
+		}
 		Instant effectiveEnd = end != null ? end : start.plus(durationOf(service));
 		requireValidRange(start, effectiveEnd);
 		requireAvailable(start, effectiveEnd, null);
 		Client client = clientService.resolveClient(firstName, lastName, phone);
-		return saveWithoutOverlap(new Appointment(client, service, start, effectiveEnd));
+		Appointment appointment = new Appointment(client, service, start, effectiveEnd);
+		appointment.chargePrice(chargedPrice);
+		return saveWithoutOverlap(appointment);
 	}
 
 	@Transactional

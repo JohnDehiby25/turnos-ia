@@ -2,8 +2,10 @@ package com.turnosia.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -21,6 +23,7 @@ import org.springframework.mock.web.MockHttpSession;
 import com.turnosia.TestcontainersConfiguration;
 import com.turnosia.domain.AppUser;
 import com.turnosia.repository.AppUserRepository;
+import com.turnosia.repository.ServiceTypeRepository;
 
 /**
  * Flujo de autenticación completo: sesión real, acceso protegido, cierre de sesión
@@ -41,6 +44,9 @@ class SecurityIntegrationTest {
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+
+	@Autowired
+	private ServiceTypeRepository serviceTypeRepository;
 
 	@BeforeEach
 	void setUp() {
@@ -117,6 +123,54 @@ class SecurityIntegrationTest {
 		mockMvc.perform(get("/api/appointments/5").session(session))
 				.andExpect(status().isMethodNotAllowed())
 				.andExpect(jsonPath("$.code").value("METHOD_NOT_ALLOWED"));
+	}
+
+	@Test
+	void updateServicePrice_withoutSession_returns401() throws Exception {
+		mockMvc.perform(put("/api/services/1/price").with(csrf()).contentType(APPLICATION_JSON)
+				.content("{\"price\":40000}"))
+				.andExpect(status().isUnauthorized());
+	}
+
+	@Test
+	void updateServicePrice_nonAdminRole_returns403() throws Exception {
+		mockMvc.perform(put("/api/services/1/price").with(csrf()).with(user("staff").roles("STAFF"))
+				.contentType(APPLICATION_JSON).content("{\"price\":40000}"))
+				.andExpect(status().isForbidden())
+				.andExpect(jsonPath("$.code").value("FORBIDDEN"));
+	}
+
+	@Test
+	void statsSummary_withoutSession_returns401() throws Exception {
+		mockMvc.perform(get("/api/stats/summary").param("period", "DAY").param("date", "2026-11-19"))
+				.andExpect(status().isUnauthorized());
+	}
+
+	@Test
+	void statsSummary_nonAdminRole_returns403() throws Exception {
+		mockMvc.perform(get("/api/stats/summary").with(user("staff").roles("STAFF"))
+				.param("period", "DAY").param("date", "2026-11-19"))
+				.andExpect(status().isForbidden());
+	}
+
+	@Test
+	void statsSummary_admin_returns200() throws Exception {
+		MockHttpSession session = login();
+
+		mockMvc.perform(get("/api/stats/summary").session(session).param("period", "DAY").param("date", "2026-11-19"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.earned").exists());
+	}
+
+	@Test
+	void updateServicePrice_admin_returns200() throws Exception {
+		Long serviceId = serviceTypeRepository.findAll().getFirst().getId();
+		MockHttpSession session = login();
+
+		mockMvc.perform(put("/api/services/" + serviceId + "/price").with(csrf()).session(session)
+				.contentType(APPLICATION_JSON).content("{\"price\":40000}"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.price").value(40000));
 	}
 
 	private MockHttpSession login() throws Exception {

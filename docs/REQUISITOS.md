@@ -32,8 +32,8 @@ Mechas, Cepillado, Detalle (más los que se agreguen). Cada servicio tiene durac
 ## Precios y estadísticas (secundario: el núcleo son los turnos)
 - RF11. **Ver precios**: lista de servicios con su precio. El panel y el bot la muestran (los clientes también pueden consultarla).
   La dueña edita los precios desde el panel.
-- RF12. Cada cita guarda el precio cobrado (`price_charged`) al crearse: copia del precio del servicio, ajustable
-  (descuento, caso especial). Cambiar el precio de un servicio NO altera citas ya creadas.
+- RF12. Cada cita tiene precio obligatorio (`price_charged`), que la dueña fija al crearla porque depende de varios
+  factores. El precio del servicio es solo referencia. Cambiar el precio de un servicio NO altera citas ya creadas.
 - RF13. **Resumen por día, semana (lunes a domingo) y mes**, y por rango libre:
   - número de citas por estado,
   - **dinero ganado** = suma de `price_charged` de citas `ATTENDED`,

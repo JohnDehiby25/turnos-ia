@@ -3,18 +3,23 @@
 ## Estado actual
 - Etapa: E1 — Backend núcleo (sin IA)
 - Última tarea terminada: E1-T6 (commit `912e699`, publicado en GitHub)
-- Tarea en curso: E1-T7 (seguridad) terminada en código y pruebas; pendiente de OK del usuario para commit
-- Próxima tarea: E1-T8 (precios) — pendiente de confirmar
+- Tareas terminadas sin commit (pendiente de OK del desarrollador): E1-T7 (seguridad), E1-T8 (precios) y E1-T9 (estadísticas)
+- Próxima tarea: E1-T10 no existe en el roadmap; la etapa E1 pasa a revisión de puerta de salida (ver `ROADMAP.md`)
 
 ## Punto de control
-E1-T7 lista en código: `SecurityConfig` (sesión con cookie, CSRF con cookie `XSRF-TOKEN`, CORS por `ALLOWED_ORIGINS`,
-401/403 en `{code, message}`), `AuthController` (login/logout/me/csrf), `AuthService`, `LoginRateLimiter` (5 intentos en
-15 min, bloqueo 15 min, por usuario y por IP), `AdminUserService` + `AdminUserInitializer` (sincroniza `ADMIN_USERNAME` /
-`ADMIN_PASSWORD` al arrancar), migración V3 `app_user`. Suite completa: 127 tests en verde (Docker encendido).
-Falta: OK para commit + push.
-Siguiente: E1-T8 (precios: `ServiceCatalogService`, `GET/PUT /api/services`, `price_charged` al crear cita).
+E1-T8 y E1-T9 listas en código y pruebas. Suite completa: 158 tests en verde (Docker encendido).
+- Precio: cada cita lleva precio obligatorio (`POST /api/appointments` exige `price`; BD `price_charged NOT NULL` por V4).
+- Catálogo: `GET /api/services` y `PUT /api/services/{id}/price` (solo ADMIN).
+- Resumen: `GET /api/stats/summary` con `period=DAY|WEEK|MONTH&date=` o `from=&to=` (solo ADMIN). Devuelve conteos por estado, dinero ganado, proyectado, no percibido, propinas y servicios más pedidos.
+- Cobertura de `service` (JaCoCo, añadido al `pom.xml` según `TESTING.md`): 98,7 % líneas y 90,3 % ramas (meta ≥ 80 %). Suite: 158 verdes.
+- Checklist `SEGURIDAD.md` de E1: completo salvo el usuario de BD con permisos mínimos, que es de E4 (despliegue).
+- Pendiente para cerrar E1: (a) demo de API con requests reales (requiere BD arriba y credenciales locales; lo corre el desarrollador); (b) OK del desarrollador para la puerta de salida de E1; (c) commit + push de E1-T7, E1-T8 y E1-T9 con OK explícito. Migración V4 falla si hay citas antiguas sin precio.
 
 ## Decisiones tomadas
+- 2026-11-20 (E1-T8): el precio de cada cita lo decide el admin por caso. `POST /api/appointments` exige `price`, y el servicio rechaza la cita sin precio (`APPOINTMENT_PRICE_REQUIRED`). Migración V4: `price_charged NOT NULL`. El precio del servicio queda como referencia para la UI, no se copia automáticamente desde el API.
+- 2026-11-20 (E1-T9): el resumen cuenta por estado y suma dinero en SQL agregado (`AppointmentRepository.totalsByStatus`); `StatsService` solo arma rangos (día, semana lunes-domingo, mes) en `America/Bogota` y el rango libre `from`/`to`. Servicios más pedidos excluyen canceladas. Solo ADMIN.
+- 2026-11-20 (E1-T8): solo ADMIN cambia precios (`PUT /api/services/**` en `SecurityConfig`). `GET /api/services` lo ve cualquier sesión y lista solo servicios activos.
+- 2026-11-20 (E1-T8): el cambio de precio de un servicio no toca `price_charged` de citas existentes (cubierto por test).
 - 2026-11-18 (E1-T7): sesión con cookie `httpOnly` en vez de JWT: un solo usuario, el front y la API bajo el mismo dominio y nada de tokens en el navegador. CSRF activo con cookie `XSRF-TOKEN`.
 - 2026-11-18 (E1-T7): la contraseña de la dueña se define con `ADMIN_PASSWORD` y se sincroniza al arrancar; si la variable está vacía, la cuenta existente conserva su hash. En la BD solo hay hash BCrypt.
 - 2026-11-18 (E1-T7): el límite de intentos cuenta por usuario y por IP, en memoria. Detrás de un proxy (Railway) todas las peticiones vienen de la misma IP, así que el bloqueo es por servidor.
@@ -57,6 +62,8 @@ Siguiente: E1-T8 (precios: `ServiceCatalogService`, `GET/PUT /api/services`, `pr
 - Clientes que pagan a fin de mes (cepillados semanales): posible cuentas por cobrar — fuera de alcance por ahora.
 
 ## Bitácora (más reciente arriba)
+- 2026-11-20 — E1-T9: `StatsService` + `StatsController` (`GET /api/stats/summary`), consultas agregadas en `AppointmentRepository`, proyecciones `StatusTotal`/`ServiceCount`, regla ADMIN en `/api/stats/**`. Cambio de E1-T8: el precio pasa a ser obligatorio por cita (V4 `NOT NULL`, validación en API y servicio). Tests: 6 unitarios de `StatsService`, 1 integración con PostgreSQL, 3 de controlador, 3 de seguridad; los fixtures de citas ahora llevan precio. Suite completa 158 verdes. Sin commit (pendiente de OK). Verificación de errores de `AppointmentController.java`: compila sin errores ni avisos; sus tests pasan.
+- 2026-11-20 — E1-T8: catálogo de precios (`ServiceCatalogService/Controller`, `ServiceResponse`, `UpdateServicePriceRequest`), precio opcional por cita, `priceCharged` en la respuesta, regla ADMIN en `SecurityConfig`. Tests: 4 de catálogo + 4 de copia de precio en `AppointmentServiceTest` + 4 de controlador + 3 de seguridad. Suite completa 144 verdes. Sin commit (pendiente de OK). Docker estaba apagado: se encendió Docker Desktop para correr las pruebas. Un usuario con rol distinto de ADMIN no se puede guardar en BD (V3 solo permite `ADMIN`), por eso el 403 se prueba con `user(...).roles(...)`.
 - 2026-11-18 — Problemas del IDE corregidos: avisos de nulos y de Testcontainers; `app.*` tipado en un único `AppProperties` (prefijo `app`) para que el YAML lo reconozca; `ScheduleController` con `/{date}` en el `@RequestMapping` de la clase (aviso informativo). Excepción de negocio con causa y `serialVersionUID`; handlers sin parámetros sin usar. Extensión `ms-ossdata.vscode-pgsql` desinstalada (origen de los 3 errores de SQL y del texto en chino). Análisis tipo IDE: 0 avisos; estricto: 0. Suite 129 verdes; CORS verificado en vivo. Sin commit.
 - 2026-11-18 — Corrección: la app no arrancaba porque Spring Boot no leía `.env` (fallaba con "password authentication failed"). Se añadió `spring.config.import: optional:file:../.env[.properties]` en `application.yml`; ahora `./mvnw spring-boot:run` funciona sin exportar variables. Se limpió la cuenta `admin` que había dejado una verificación previa y se definió `ADMIN_USERNAME`/`ADMIN_PASSWORD` en `.env` (valor aleatorio, solo en el archivo local). Verificado: arranque sin variables + login 200 + endpoint protegido 200. Suite 127 verdes.
 - 2026-11-18 — E1-T7: sesión con cookie, BCrypt, CORS restringido, CSRF, rate limiting en login, migración V3 `app_user`. 7 de controlador, 5 de integración de seguridad, 8 de límite de intentos, 3 de sincronización de usuaria. Suite completa 127 verdes. Sin commit (pendiente de OK).

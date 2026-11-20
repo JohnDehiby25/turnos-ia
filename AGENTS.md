@@ -1,105 +1,108 @@
 # Turnos IA — Asistente de turnos para salón de belleza
 
-Sistema para gestionar los turnos de un salón de belleza pequeño. La dueña (mi mamá) NO es técnica:
-todo debe ser simple, con letra grande y pocos botones. Un bot de IA atiende por WhatsApp y/o chat web,
-y un panel web muestra las citas con claridad.
+Sistema para gestionar los turnos de un salón pequeño. La dueña NO es técnica: todo simple, letra grande, pocos botones.
+Un bot de IA atiende por WhatsApp y/o chat web; un panel web muestra las citas.
 
-## PROTOCOLO DE TRABAJO POR ETAPAS (lo más importante)
-Yo (el desarrollador) quiero ir paso a paso. NO construyas el sistema de una sola vez.
+## Dónde está todo
+- El repo git es `turnos-ia/` (origin `github.com/JohnDehiby25/turnos-ia`, rama `main`). La carpeta padre del workspace NO es repo: ejecuta `git` y los comandos de build desde `turnos-ia/`.
+- Esta guía es la autoritativa. El estado (etapa, última y próxima tarea) vive SOLO en `docs/PROGRESO.md`; no lo copies aquí.
+- `opencode.json` carga al inicio `docs/PROGRESO.md`, `ROADMAP.md`, `REQUISITOS.md` y `ARQUITECTURA.md`.
+- `.env` (local, en `.gitignore`): NUNCA lo leas ni lo muestres. Usa `.env.example` como plantilla.
 
-**Al iniciar cada sesión:**
+## Protocolo por etapas (lo más importante)
+El desarrollador quiere ir paso a paso. NO construyas el sistema de una vez.
+
+Al iniciar sesión:
 1. Lee `docs/PROGRESO.md` y `docs/ROADMAP.md`.
-2. Resúmeme en máx. 5 líneas: etapa actual, qué quedó hecho, qué quedó a medias y cuál es la próxima tarea.
-3. Pregúntame UNA cosa: "¿Seguimos con <próxima tarea> o prefieres otra cosa?". Espera mi respuesta antes de tocar código.
+2. Resume en máx. 5 líneas: etapa actual, hecho, a medias y próxima tarea.
+3. Pregunta UNA cosa: "¿Seguimos con <próxima tarea> o prefieres otra cosa?". Espera respuesta antes de tocar código.
 
-**Durante la sesión:**
-- Trabaja UNA tarea del roadmap a la vez (tamaño ≈ 1 sesión corta). Si es más grande, propón dividirla.
-- No empieces la siguiente etapa sin mi aprobación explícita (cada etapa tiene una "puerta de salida" en el roadmap).
-- No agregues funcionalidades fuera de la tarea actual. Si ves algo útil, anótalo en `docs/PROGRESO.md > Ideas`.
-- Antes de escribir código en una tarea nueva, dime el plan en 3–5 viñetas y espera mi OK.
+Durante la sesión:
+- UNA tarea del roadmap a la vez. Si es grande, propón dividirla.
+- No empieces otra etapa sin aprobación explícita (cada etapa tiene "puerta de salida" en `ROADMAP.md`).
+- No agregues funcionalidad fuera de la tarea. Lo útil que aparezca va a `docs/PROGRESO.md > Ideas`.
+- Antes de escribir código en una tarea nueva: plan en 3–5 viñetas y espera OK.
 
-**Al terminar cada tarea, muestra un REPORTE DE AVANCE:**
-1. Qué hiciste (2–4 líneas).
-2. Cómo verlo funcionando (comando, URL o ejemplo de request/respuesta).
-3. Pruebas: cuáles escribiste y resultado (`X passed`).
-4. Seguridad y buenas prácticas aplicadas (1–3 viñetas).
-5. Próxima tarea sugerida.
-Luego actualiza `docs/PROGRESO.md` y haz commit + push a GitHub (regla fija, ver "Reglas críticas").
+Al terminar una tarea, entrega un REPORTE DE AVANCE: (1) qué hiciste, (2) cómo verlo funcionando, (3) pruebas y resultado (`X passed`), (4) seguridad y buenas prácticas aplicadas, (5) próxima tarea sugerida. Luego actualiza `docs/PROGRESO.md`.
 
-**Al cerrar la sesión** (si digo "cerramos" o similar): deja `docs/PROGRESO.md` con un punto de control claro
-("Estoy en…, falta…, siguiente paso…").
+**Commit y push: SOLO con OK explícito del desarrollador.** Esta regla reemplaza la antigua "commit + push sin esperar aprobación". Formato de commit: `feat(E1-T2): ...`, `docs: ...`. El comando `/avance` (`.opencode/command/avance.md`) pide el OK.
+
+Al cerrar sesión (si el desarrollador lo dice): deja en `docs/PROGRESO.md` un punto de control ("Estoy en…, falta…, siguiente paso…").
 
 ## Idioma
-- Documentación, textos de la interfaz y respuestas del bot: español (Colombia).
-- Código (clases, variables, endpoints, commits): inglés.
-- Zona horaria SIEMPRE `America/Bogota`. Guardar fechas en UTC en BD, mostrar en hora local.
+- Documentación, textos de UI y respuestas del bot: español (Colombia). Código, endpoints y commits: inglés.
+- Zona horaria `America/Bogota`. En BD las fechas van en UTC y se muestran en hora local.
 
-## Stack (no cambiar sin preguntarme)
-- Backend: Java 21, Spring Boot 4, Maven, Spring Web, Spring Data JPA, Validation, Spring Security, Flyway, Spring AI.
-- Base de datos: PostgreSQL 16 + extensión pgvector (SQL y vectores en UNA sola BD).
-- Frontend web: React + TypeScript + Vite + Tailwind CSS (mobile-first, PWA).
-- IA: LLM con *tool calling* + embeddings (proveedor configurable por variables de entorno).
-- Canal: WhatsApp Cloud API (webhook) y chat web.
-- Infra: Docker + docker-compose, GitHub (+ Actions), despliegue en Railway, dominio propio.
-- App mobile: etapa FINAL. Solo se decide el enfoque (Capacitor sobre la web vs. React Native/Expo) al llegar ahí.
+## Stack (no cambiar sin preguntar)
+- Backend: Java 21, Spring Boot 4.1.2, Maven, Spring Web MVC, Spring Data JPA, Validation, Spring Security, Flyway. Spring AI todavía NO está en `pom.xml`.
+- BD: PostgreSQL 16 + pgvector (SQL y vectores en una sola BD).
+- Frontend (planeado): React + TypeScript + Vite + Tailwind, mobile-first, PWA.
+- IA: LLM con tool calling + embeddings, proveedor configurable por variables de entorno.
+- Canal: WhatsApp Cloud API (webhook) y chat web. Infra: Docker + compose, GitHub Actions, Railway.
+- App móvil: etapa FINAL; solo se decide el enfoque (Capacitor vs. React Native/Expo) al llegar ahí.
 
-## Arquitectura: cliente-servidor en capas
-Front → API REST → Backend en capas → PostgreSQL/pgvector.
-Capas (dependencias solo hacia abajo): `controller → service → repository → domain`.
-- `controller`: HTTP, validación de entrada, DTOs. Sin lógica de negocio.
-- `service`: reglas de negocio y transacciones.
-- `repository`: acceso a datos. Sin lógica de negocio.
-- `domain`: entidades y enums.
-- `ai`: orquestación del bot; sus tools llaman a `service`, nunca a `repository`.
-- `integration.whatsapp`: webhook y cliente de envío.
-Detalle en `docs/ARQUITECTURA.md`.
+## Backend (`backend/`, paquete `com.turnosia`)
+- Paquetes existentes en `src/main/java/com/turnosia/`: `config`, `controller`, `service`, `repository`, `domain`, `dto`. `ai/` e `integration.whatsapp` aún NO existen.
+- Dependencias solo hacia abajo: `controller → service → repository → domain`. Controladores sin lógica de negocio ni repositorios. Las tools de `ai` (cuando exista) llaman a `service`, nunca a `repository`.
+- Esquema controlado por Flyway (`backend/src/main/resources/db/migration/`, V1–V3). `ddl-auto: validate`: Hibernate no crea tablas. Cambio de esquema = migración nueva (V4…). Nunca editar una migración ya aplicada.
+- `open-in-view: false`: relaciones que se usan en DTOs se cargan de forma ansiosa (ver `PROGRESO.md`).
+- La BD rechaza solapes con la restricción `appointment_no_overlap` (EXCLUDE gist, solo citas no `CANCELLED`). Citas contiguas [start, end) sí se permiten. La validación del service NO reemplaza esa restricción.
+- Dinero: `BigDecimal` / `NUMERIC(12,2)`. En `service_type`, `price` NULL = "por confirmar".
+- Tiempo: las respuestas de la API van en UTC (`Instant`); las peticiones exigen zona (`OffsetDateTime`). Para la hora actual inyecta `Clock` (bean en `config/ClockConfig`), no uses la hora real.
 
-## Estructura del repo
-```
-backend/  frontend/  diseño/  docs/  .opencode/{skills,command}/  docker-compose.yml
-```
+## Comandos
+Backend (desde `backend/`; en Windows usa `.\mvnw.cmd` en vez de `./mvnw`):
+- `./mvnw spring-boot:run`: necesita la BD arriba y `DB_PASSWORD` en `../.env` (la app lo importa sola). Sin `DB_PASSWORD` falla con "password authentication failed".
+- `./mvnw test`: suite completa. Requiere **Docker daemon encendido**: Testcontainers levanta `pgvector/pgvector:pg16`. Si fallan al arrancar, es Docker, no el código.
+- Una clase: `./mvnw test -Dtest=ClientRepositoryTest`.
 
-## Documentos: cuándo leerlos
-- Siempre: `PROGRESO.md`, `ROADMAP.md`, `REQUISITOS.md`, `ARQUITECTURA.md` (cargados por opencode.json).
-- Al tocar código de backend o frontend: `BUENAS_PRACTICAS.md` y skill `capas-spring-boot` / `front-react-tailwind`.
-- Al escribir o cambiar tests: `TESTING.md` y skill `pruebas-unitarias`.
-- Al tocar auth, datos personales, webhook, IA o despliegue: `SEGURIDAD.md` y skill `seguridad`.
-- Al trabajar el bot: `BOT_SPEC.md`.
-- Al trabajar precios o resúmenes de dinero: skill `precios-y-estadisticas`.
+Base de datos (desde `turnos-ia/`):
+- `docker compose up -d`: levanta solo `db` (pgvector pg16 en `127.0.0.1:5432`). Exige `DB_PASSWORD` en `.env`.
+- `docker compose up --build` NO funciona todavía: el compose solo tiene `db`. Backend y frontend en contenedores llegan en E4.
 
-## Comandos (actualizar cuando existan)
-- Backend: `cd backend && ./mvnw test` · `./mvnw spring-boot:run`
-- Frontend: `cd frontend && npm install && npm run dev` · `npm run test` · `npm run lint` · `npm run build`
-- Todo: `docker compose up --build`
+Frontend: NO existe todavía (`frontend/` solo tiene README, sin `package.json`). Cuando exista (desde E2-T1): `npm install`, `npm run dev|test|lint|build`. Verifica `package.json` antes de asumir scripts.
+
+Orden de verificación antes de dar una tarea por terminada: compila → tests (nuevos y existentes) → lint.
+
+## Pruebas
+- JUnit 5, Mockito, AssertJ, MockMvc, Testcontainers. Ubicación: `backend/src/test/java/com/turnosia/`.
+- Integración con BD real: `@Import(TestcontainersConfiguration.class)` (copia el patrón existente).
+- Spring Boot 4: `@DataJpaTest` está en `org.springframework.boot.data.jpa.test.autoconfigure` y `@AutoConfigureTestDatabase` en `org.springframework.boot.jdbc.test.autoconfigure`. No uses los paquetes de Boot 3.
+- Unitarias obligatorias para cada regla de negocio en `service` (sin Spring ni BD, repositorios con Mockito). Ninguna tarea termina sin ellas.
+- Nombres: `metodo_condicion_resultadoEsperado`. Sin depender de la hora real.
+- El LLM SIEMPRE se simula en tests.
+- Bug = primero un test que lo reproduce, luego el arreglo.
+- Detalle: `docs/TESTING.md` y skill `pruebas-unitarias`.
 
 ## Reglas críticas (no negociables)
-- La BD relacional es la ÚNICA fuente de verdad de citas y disponibilidad. La vectorial solo para búsqueda semántica.
-- El bot nunca inventa horarios: siempre consulta herramientas del backend.
-- El núcleo del proyecto son los TURNOS. Precios y estadísticas son secundarios: no empezarlos antes de E1-T8 (ver roadmap).
-- El dinero lo calcula el backend (SQL + `BigDecimal`), nunca la IA. El bot solo lo consulta con tools y lo presenta.
-- Cada cita guarda `price_charged` al crearse; cambiar el precio de un servicio no modifica citas anteriores.
+- La BD relacional es la ÚNICA fuente de verdad de citas y disponibilidad. La vectorial solo sirve para búsqueda semántica.
+- El bot nunca inventa horarios: siempre consulta tools del backend.
+- El núcleo son los TURNOS. Precios y estadísticas son secundarios: no empezarlos antes de E1-T8.
+- El dinero lo calcula el backend (SQL + `BigDecimal`), nunca la IA. El bot solo consulta y presenta.
+- Cada cita guarda `price_charged` al crearse; cambiar el precio de un servicio no toca citas anteriores.
 - Toda escritura iniciada por el bot pide confirmación explícita antes de ejecutarse.
 - No hay dobles reservas: validar solapamiento dentro de una transacción.
-- Migraciones solo con Flyway; nunca editar una migración ya aplicada.
-- Nunca commitear secretos. Variables de entorno + `.env.example`.
-- No borrar citas: se cancelan (`CANCELLED`).
-- Ninguna tarea se da por terminada sin pruebas unitarias de su lógica de negocio.
-- Seguridad desde el inicio, no "al final": aplica el checklist de `SEGURIDAD.md` de la etapa en curso.
-- Commit + push a GitHub después de cada tarea terminada (sin esperar aprobación para commitear).
+- No se borran citas: se cancelan (`CANCELLED`).
+- Nunca commitear secretos: variables de entorno + `.env.example`.
+- Seguridad desde el inicio: aplica el checklist de `docs/SEGURIDAD.md` de la etapa en curso. Al tocar auth, datos personales, webhook, IA o despliegue, usa también la skill `seguridad`.
+- Commit y push solo con OK explícito (ver Protocolo).
 
-## Buenas prácticas (resumen; detalle en `docs/BUENAS_PRACTICAS.md`)
-- Código simple primero (KISS/YAGNI). Un patrón de diseño solo si resuelve un problema concreto de ESTA tarea,
-  y dime cuál usas y por qué.
-- Estructuras de datos estándar de Java/TS (List, Map, Set, TreeMap). Estructuras propias solo si son necesarias
-  y justificadas con una frase.
-- SOLID razonable, nombres claros, funciones cortas, sin código muerto ni comentarios obvios.
+## Dónde leer más
+- Backend o frontend: `docs/BUENAS_PRACTICAS.md`, skills `capas-spring-boot` / `front-react-tailwind`.
+- Agenda (solapes, horarios, domingos): skill `reglas-de-agenda`. Precios y resúmenes: skill `precios-y-estadisticas`.
+- Bot: `docs/BOT_SPEC.md`.
+
+## Buenas prácticas (resumen)
+- Código simple primero (KISS/YAGNI). Un patrón de diseño solo si resuelve un problema concreto de la tarea, y di cuál y por qué.
+- Estructuras estándar de Java/TS. Sin código muerto ni comentarios obvios.
 
 ## Accesibilidad / UX
 - Fuente base ≥ 18px, botones ≥ 48px, alto contraste, máx. 3 acciones por pantalla.
 - Estados con color + texto + ícono. Vista principal = "Hoy".
 
 ## Definition of Done (por tarea)
-- Compila, tests nuevos y existentes en verde, lint sin errores.
+- Compila, tests nuevos y existentes en verde, lint sin errores (cuando exista frontend).
 - Checklist de seguridad de la tarea revisado.
-- Funciona en pantalla de celular (360px) si toca el front.
+- Si toca el front: funciona en pantalla de 360px.
 - `docs/PROGRESO.md` actualizado y reporte de avance entregado.
+- Commit y push solo tras el OK del desarrollador.

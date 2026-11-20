@@ -3,6 +3,7 @@ package com.turnosia.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.Instant;
@@ -60,7 +61,13 @@ class AppointmentServiceIntegrationTest {
 	void setUp() {
 		workingHoursRepository.save(new WorkingHours(DayOfWeek.MONDAY, true,
 				LocalTime.of(8, 0), LocalTime.of(18, 0), LocalTime.of(12, 0), LocalTime.of(13, 0)));
-		cepilladoId = serviceTypeRepository.save(new ServiceType("Cepillado", 45, null)).getId();
+		cepilladoId = serviceTypeRepository.save(new ServiceType("Cepillado", 45, new BigDecimal("35000.00"))).getId();
+	}
+
+	private static Appointment appointmentAt(Client client, ServiceType service, Instant start) {
+		Appointment appointment = new Appointment(client, service, start, start.plus(CEPILLADO));
+		appointment.chargePrice(new BigDecimal("35000.00"));
+		return appointment;
 	}
 
 	@Test
@@ -117,10 +124,10 @@ class AppointmentServiceIntegrationTest {
 	void databaseRejectsOverlap_errorMentionsConstraintName() {
 		Client client = clientRepository.save(new Client("Ana", "Gómez", null));
 		ServiceType service = serviceTypeRepository.findById(cepilladoId).orElseThrow();
-		appointmentRepository.saveAndFlush(new Appointment(client, service, MONDAY_9, MONDAY_9.plus(CEPILLADO)));
+		appointmentRepository.saveAndFlush(appointmentAt(client, service, MONDAY_9));
+		Appointment overlapping = appointmentAt(client, service, MONDAY_9.plusSeconds(1800));
 
-		assertThatThrownBy(() -> appointmentRepository.saveAndFlush(
-				new Appointment(client, service, MONDAY_9.plusSeconds(1800), MONDAY_9.plusSeconds(1800).plus(CEPILLADO))))
+		assertThatThrownBy(() -> appointmentRepository.saveAndFlush(overlapping))
 				.isInstanceOfSatisfying(DataIntegrityViolationException.class,
 						e -> assertThat(e.getMostSpecificCause().getMessage()).contains("appointment_no_overlap"));
 	}

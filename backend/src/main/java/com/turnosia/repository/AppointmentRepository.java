@@ -36,4 +36,24 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 			ORDER BY a.startAt
 			""")
 	List<Appointment> findNotCancelledOverlapping(@Param("from") Instant from, @Param("to") Instant to);
+
+	/** Totales por estado de las citas que empiezan en [from, to). Base del resumen de dinero (RF13). */
+	@Query("""
+			SELECT new com.turnosia.repository.StatusTotal(a.status, COUNT(a), SUM(a.priceCharged), SUM(a.tip))
+			FROM Appointment a
+			WHERE a.startAt >= :from AND a.startAt < :to
+			GROUP BY a.status
+			""")
+	List<StatusTotal> totalsByStatus(@Param("from") Instant from, @Param("to") Instant to);
+
+	/** Servicios más pedidos en [from, to), sin contar citas canceladas. */
+	@Query("""
+			SELECT new com.turnosia.repository.ServiceCount(a.serviceType.name, COUNT(a))
+			FROM Appointment a
+			WHERE a.startAt >= :from AND a.startAt < :to
+			  AND a.status <> com.turnosia.domain.AppointmentStatus.CANCELLED
+			GROUP BY a.serviceType.name
+			ORDER BY COUNT(a) DESC, a.serviceType.name
+			""")
+	List<ServiceCount> topServices(@Param("from") Instant from, @Param("to") Instant to);
 }

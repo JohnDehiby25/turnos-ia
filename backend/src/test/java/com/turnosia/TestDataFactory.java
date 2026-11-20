@@ -1,5 +1,6 @@
 package com.turnosia;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 import com.turnosia.domain.Appointment;
@@ -24,6 +25,8 @@ public final class TestDataFactory {
 
 	public static Appointment appointment(Client client, ServiceType serviceType,
 			OffsetDateTime start, OffsetDateTime end) {
-		return new Appointment(client, serviceType, start.toInstant(), end.toInstant());
+		Appointment appointment = new Appointment(client, serviceType, start.toInstant(), end.toInstant());
+		appointment.chargePrice(new BigDecimal("35000.00"));
+		return appointment;
 	}
 }

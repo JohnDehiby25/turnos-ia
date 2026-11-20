@@ -56,6 +56,10 @@ public class ServiceType {
 		return price;
 	}
 
+	public void changePrice(BigDecimal newPrice) {
+		this.price = newPrice;
+	}
+
 	public boolean isActive() {
 		return active;
 	}
