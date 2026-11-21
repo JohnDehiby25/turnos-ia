@@ -3,8 +3,8 @@
 ## Estado actual
 - Etapa: E1 — cerrada (puerta de salida aprobada por el desarrollador)
 - Última tarea publicada: E1-T7, E1-T8 y E1-T9 en commit `b1d72d4` (push a `main`)
-- Etapa: E2 — Panel web. E2-T1 terminada en código y pruebas, sin commit (pendiente de OK del desarrollador)
-- Próxima tarea: E2-T2 (login + rutas protegidas), con plan previo y OK del desarrollador
+- Etapa: E2 — Panel web. E2-T1 en commit `40012d8`. E2-T2 en commit local (`git log`), sin push (pendiente de OK del desarrollador)
+- Próxima tarea: E2-T3 (pantalla "Hoy" con turnos reales), con plan previo y OK del desarrollador
 
 ## Punto de control
 E1-T8 y E1-T9 listas en código y pruebas. Suite completa: 158 tests en verde (Docker encendido).
@@ -16,6 +16,10 @@ E1-T8 y E1-T9 listas en código y pruebas. Suite completa: 158 tests en verde (D
 - Pendiente para cerrar E1: (a) demo de API con requests reales (requiere BD arriba y credenciales locales; lo corre el desarrollador); (b) OK del desarrollador para la puerta de salida de E1; (c) commit + push de E1-T7, E1-T8 y E1-T9 con OK explícito. Migración V4 falla si hay citas antiguas sin precio.
 
 ## Decisiones tomadas
+- 2026-11-21 (E2-T2): sesión en `AuthProvider` + `useSession` (`src/auth/`). Al cargar se llama `GET /api/auth/me`; un 401 significa sin sesión. `RequireSession` redirige a `/login` y `App.tsx` define las rutas (`react-router-dom` 7).
+- 2026-11-21 (E2-T2): puertos seguros: Vite escucha solo en `127.0.0.1:5173` con `strictPort`, el proxy `/api` apunta a `127.0.0.1:8080` y `preview` a `127.0.0.1:4173`. El servidor de desarrollo no queda expuesto en la red local.
+- 2026-11-21 (E2-T2): diseño "libro de agenda": azul cobalto, negro y blanco; marca en serif (Georgia) y texto en sans. Sin tarjetas genéricas ni etiquetas en mayúsculas. Botones ≥ 48 px, texto base 18 px, foco visible con borde azul.
+- 2026-11-21 (E2-T2): cerrar sesión borra la sesión local aunque falle la llamada al servidor, para no dejar a la dueña dentro del panel.
 - 2026-11-20 (E1-T8): el precio de cada cita lo decide el admin por caso. `POST /api/appointments` exige `price`, y el servicio rechaza la cita sin precio (`APPOINTMENT_PRICE_REQUIRED`). Migración V4: `price_charged NOT NULL`. El precio del servicio queda como referencia para la UI, no se copia automáticamente desde el API.
 - 2026-11-20 (E1-T9): el resumen cuenta por estado y suma dinero en SQL agregado (`AppointmentRepository.totalsByStatus`); `StatsService` solo arma rangos (día, semana lunes-domingo, mes) en `America/Bogota` y el rango libre `from`/`to`. Servicios más pedidos excluyen canceladas. Solo ADMIN.
 - 2026-11-20 (E1-T8): solo ADMIN cambia precios (`PUT /api/services/**` en `SecurityConfig`). `GET /api/services` lo ve cualquier sesión y lista solo servicios activos.
@@ -59,10 +63,12 @@ E1-T8 y E1-T9 listas en código y pruebas. Suite completa: 158 tests en verde (D
 - (ninguno)
 
 ## Ideas para después
+- Si la sesión caduca con la app abierta, las llamadas responden 401 pero la app no vuelve a `/login` todavía. Resolver en E2-T3 (manejo de expiración en `AuthProvider`); por eso el ítem de expiración de `SEGURIDAD.md > E2` sigue sin marcar.
 - Clientes que pagan a fin de mes (cepillados semanales): posible cuentas por cobrar — fuera de alcance por ahora.
 
 ## Bitácora (más reciente arriba)
-- 2026-11-21 — E2-T1: proyecto `frontend/` con Vite 8 + React 19 + TypeScript + Tailwind 4, `npm test` (Vitest + Testing Library) y `npm run lint` / `npm run build`. Cliente de API tipado en `src/api/` (`types.ts` espeja los DTOs del backend; `client.ts` con `credentials: 'include'`, cabecera `X-XSRF-TOKEN` en escrituras, reintento tras 403 y `ApiError` con `{code, message}`). Vite con proxy `/api` → `localhost:8080`. Pruebas: 5 verdes del cliente. Sin commit (pendiente de OK).
+- 2026-11-21 — E2-T2: login (`LoginPage`), sesión (`AuthProvider`/`useSession`), rutas protegidas (`RequireSession` + `SessionHeader` con "Salir") y pantalla "Hoy" provisional (`TodayPage`, solo fecha y título). Dependencia nueva: `react-router-dom`. Pruebas: 7 de sesión en `App.test.tsx`; frontend en total 12 verdes. `npm run build` y `npm run lint` sin errores. Puertos de Vite fijados a `127.0.0.1`. Sin push (pendiente de OK).
+- 2026-11-21 — E2-T1: proyecto `frontend/` con Vite 8 + React 19 + TypeScript + Tailwind 4, `npm test` (Vitest + Testing Library) y `npm run lint` / `npm run build`. Cliente de API tipado en `src/api/` (`types.ts` espeja los DTOs del backend; `client.ts` con `credentials: 'include'`, cabecera `X-XSRF-TOKEN` en escrituras, reintento tras 403 y `ApiError` con `{code, message}`). Vite con proxy `/api` → `localhost:8080`. Pruebas: 5 verdes del cliente. Commit `40012d8`.
 - 2026-11-20 — E1-T9: `StatsService` + `StatsController` (`GET /api/stats/summary`), consultas agregadas en `AppointmentRepository`, proyecciones `StatusTotal`/`ServiceCount`, regla ADMIN en `/api/stats/**`. Cambio de E1-T8: el precio pasa a ser obligatorio por cita (V4 `NOT NULL`, validación en API y servicio). Tests: 6 unitarios de `StatsService`, 1 integración con PostgreSQL, 3 de controlador, 3 de seguridad; los fixtures de citas ahora llevan precio. Suite completa 158 verdes. Sin commit (pendiente de OK). Verificación de errores de `AppointmentController.java`: compila sin errores ni avisos; sus tests pasan.
 - 2026-11-20 — E1-T8: catálogo de precios (`ServiceCatalogService/Controller`, `ServiceResponse`, `UpdateServicePriceRequest`), precio opcional por cita, `priceCharged` en la respuesta, regla ADMIN en `SecurityConfig`. Tests: 4 de catálogo + 4 de copia de precio en `AppointmentServiceTest` + 4 de controlador + 3 de seguridad. Suite completa 144 verdes. Sin commit (pendiente de OK). Docker estaba apagado: se encendió Docker Desktop para correr las pruebas. Un usuario con rol distinto de ADMIN no se puede guardar en BD (V3 solo permite `ADMIN`), por eso el 403 se prueba con `user(...).roles(...)`.
 - 2026-11-18 — Problemas del IDE corregidos: avisos de nulos y de Testcontainers; `app.*` tipado en un único `AppProperties` (prefijo `app`) para que el YAML lo reconozca; `ScheduleController` con `/{date}` en el `@RequestMapping` de la clase (aviso informativo). Excepción de negocio con causa y `serialVersionUID`; handlers sin parámetros sin usar. Extensión `ms-ossdata.vscode-pgsql` desinstalada (origen de los 3 errores de SQL y del texto en chino). Análisis tipo IDE: 0 avisos; estricto: 0. Suite 129 verdes; CORS verificado en vivo. Sin commit.

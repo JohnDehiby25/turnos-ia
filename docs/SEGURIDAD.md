@@ -19,8 +19,8 @@ Mínimo privilegio · validar toda entrada · no confiar en el cliente ni en el 
 
 ## E2 — Frontend
 - [ ] Token no expuesto en logs; manejo de expiración
-- [ ] React escapa por defecto: prohibido `dangerouslySetInnerHTML` con datos de usuario
-- [ ] Rutas protegidas; no mostrar datos sin sesión
+- [x] React escapa por defecto: prohibido `dangerouslySetInnerHTML` con datos de usuario
+- [x] Rutas protegidas; no mostrar datos sin sesión (`RequireSession`, pruebas en `App.test.tsx`)
 
 ## E3 — IA
 - [ ] El LLM solo ejecuta tools definidas, con parámetros validados por el `service` (nunca SQL ni código arbitrario)

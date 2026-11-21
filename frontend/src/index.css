@@ -1,9 +1,22 @@
 @import "tailwindcss";
 
+@theme {
+  --color-ink: #0b0d12;
+  --color-cobalt: #1d3fb8;
+  --color-cobalt-deep: #0e2366;
+  --color-mist: #e4e9f8;
+  --font-display: Georgia, "Times New Roman", serif;
+}
+
 html {
   font-size: 18px;
 }
 
 body {
-  @apply bg-white text-neutral-900 antialiased;
+  @apply bg-white text-ink antialiased;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-cobalt);
+  outline-offset: 3px;
 }
