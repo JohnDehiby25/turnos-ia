@@ -1,10 +1,10 @@
 # Progreso (el agente lo lee al iniciar y lo actualiza al terminar cada tarea)
 
 ## Estado actual
-- Etapa: E1 — Backend núcleo (sin IA)
-- Última tarea terminada: E1-T6 (commit `912e699`, publicado en GitHub)
-- Tareas terminadas sin commit (pendiente de OK del desarrollador): E1-T7 (seguridad), E1-T8 (precios) y E1-T9 (estadísticas)
-- Próxima tarea: E1-T10 no existe en el roadmap; la etapa E1 pasa a revisión de puerta de salida (ver `ROADMAP.md`)
+- Etapa: E1 — cerrada (puerta de salida aprobada por el desarrollador)
+- Última tarea publicada: E1-T7, E1-T8 y E1-T9 en commit `b1d72d4` (push a `main`)
+- Etapa: E2 — Panel web. E2-T1 terminada en código y pruebas, sin commit (pendiente de OK del desarrollador)
+- Próxima tarea: E2-T2 (login + rutas protegidas), con plan previo y OK del desarrollador
 
 ## Punto de control
 E1-T8 y E1-T9 listas en código y pruebas. Suite completa: 158 tests en verde (Docker encendido).
@@ -62,6 +62,7 @@ E1-T8 y E1-T9 listas en código y pruebas. Suite completa: 158 tests en verde (D
 - Clientes que pagan a fin de mes (cepillados semanales): posible cuentas por cobrar — fuera de alcance por ahora.
 
 ## Bitácora (más reciente arriba)
+- 2026-11-21 — E2-T1: proyecto `frontend/` con Vite 8 + React 19 + TypeScript + Tailwind 4, `npm test` (Vitest + Testing Library) y `npm run lint` / `npm run build`. Cliente de API tipado en `src/api/` (`types.ts` espeja los DTOs del backend; `client.ts` con `credentials: 'include'`, cabecera `X-XSRF-TOKEN` en escrituras, reintento tras 403 y `ApiError` con `{code, message}`). Vite con proxy `/api` → `localhost:8080`. Pruebas: 5 verdes del cliente. Sin commit (pendiente de OK).
 - 2026-11-20 — E1-T9: `StatsService` + `StatsController` (`GET /api/stats/summary`), consultas agregadas en `AppointmentRepository`, proyecciones `StatusTotal`/`ServiceCount`, regla ADMIN en `/api/stats/**`. Cambio de E1-T8: el precio pasa a ser obligatorio por cita (V4 `NOT NULL`, validación en API y servicio). Tests: 6 unitarios de `StatsService`, 1 integración con PostgreSQL, 3 de controlador, 3 de seguridad; los fixtures de citas ahora llevan precio. Suite completa 158 verdes. Sin commit (pendiente de OK). Verificación de errores de `AppointmentController.java`: compila sin errores ni avisos; sus tests pasan.
 - 2026-11-20 — E1-T8: catálogo de precios (`ServiceCatalogService/Controller`, `ServiceResponse`, `UpdateServicePriceRequest`), precio opcional por cita, `priceCharged` en la respuesta, regla ADMIN en `SecurityConfig`. Tests: 4 de catálogo + 4 de copia de precio en `AppointmentServiceTest` + 4 de controlador + 3 de seguridad. Suite completa 144 verdes. Sin commit (pendiente de OK). Docker estaba apagado: se encendió Docker Desktop para correr las pruebas. Un usuario con rol distinto de ADMIN no se puede guardar en BD (V3 solo permite `ADMIN`), por eso el 403 se prueba con `user(...).roles(...)`.
 - 2026-11-18 — Problemas del IDE corregidos: avisos de nulos y de Testcontainers; `app.*` tipado en un único `AppProperties` (prefijo `app`) para que el YAML lo reconozca; `ScheduleController` con `/{date}` en el `@RequestMapping` de la clase (aviso informativo). Excepción de negocio con causa y `serialVersionUID`; handlers sin parámetros sin usar. Extensión `ms-ossdata.vscode-pgsql` desinstalada (origen de los 3 errores de SQL y del texto en chino). Análisis tipo IDE: 0 avisos; estricto: 0. Suite 129 verdes; CORS verificado en vivo. Sin commit.

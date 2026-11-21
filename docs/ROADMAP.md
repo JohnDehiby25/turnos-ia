@@ -34,7 +34,7 @@ Estimación en "sesiones" (1 sesión ≈ 2 h). Ritmo: 4–5 h por semana (≈ 2 
 checklist de `SEGURIDAD.md` (etapa E1) completo. Demo: pedir turnos del 18/11/2026 por API, ver precios y pedir el resumen de la semana.
 
 ## E2 — Panel web
-- [ ] E2-T1 Proyecto React + TS + Tailwind + cliente de API tipado
+- [x] E2-T1 Proyecto React + TS + Tailwind + cliente de API tipado
 - [ ] E2-T2 Login + rutas protegidas
 - [ ] E2-T3 Pantalla "Hoy" (turnos con cliente, hora, tipo, estado, fecha de asignación)
 - [ ] E2-T4 Crear / cancelar / marcar atendida

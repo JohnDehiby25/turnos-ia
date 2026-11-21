@@ -60,7 +60,7 @@ Base de datos (desde `turnos-ia/`):
 - `docker compose up -d`: levanta solo `db` (pgvector pg16 en `127.0.0.1:5432`). Exige `DB_PASSWORD` en `.env`.
 - `docker compose up --build` NO funciona todavía: el compose solo tiene `db`. Backend y frontend en contenedores llegan en E4.
 
-Frontend: NO existe todavía (`frontend/` solo tiene README, sin `package.json`). Cuando exista (desde E2-T1): `npm install`, `npm run dev|test|lint|build`. Verifica `package.json` antes de asumir scripts.
+Frontend (desde `frontend/`, desde E2-T1): `npm install`, `npm run dev|test|lint|build`. Verifica `package.json` antes de asumir scripts.
 
 Orden de verificación antes de dar una tarea por terminada: compila → tests (nuevos y existentes) → lint.
 

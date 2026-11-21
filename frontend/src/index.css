@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+html {
+  font-size: 18px;
+}
+
+body {
+  @apply bg-white text-neutral-900 antialiased;
+}
